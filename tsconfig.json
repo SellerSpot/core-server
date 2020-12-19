@@ -10,19 +10,16 @@
         "removeComments": true,
         "allowSyntheticDefaultImports": true,
         "allowJs": true,
-        "baseUrl": "/",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "downlevelIteration": true,
-        // "paths": {} // will be used for module resolution
+        "baseUrl": "src",
+        "paths": {
+            // TsconfigPathsPlugin usage here
+        }
     },
     "include": [
         "src",
-        "global.d.ts",
-        "webpack.config.ts",
-    ],
-    "exclude": [
-        "node_modules"
     ]
 }

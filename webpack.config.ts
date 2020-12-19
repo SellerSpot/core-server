@@ -11,7 +11,7 @@ const webpackConfiguration = (env: {
 }): Configuration => {
     const isProduction = env.production ? true : false;
     return {
-        entry: 'src',
+        entry: './src',
         resolve: {
             extensions: ['.ts', '.js'],
             plugins: [new TsconfigPathsPlugin()],
@@ -34,13 +34,13 @@ const webpackConfiguration = (env: {
         },
         plugins: [
             new webpack.DefinePlugin({
-                'process.env.NODE_ENV': isProduction ? 'production' : 'development',
+                'process.env.ENV': isProduction ? 'production' : 'development',
                 'process.env.APP_NAME': JSON.stringify(packageJson.name),
                 'process.env.APP_VERSION': JSON.stringify(packageJson.version),
             }),
             new ForkTsCheckerWebpackPlugin({
                 eslint: {
-                    files: 'src',
+                    files: './src',
                 },
             }),
             !isProduction
