@@ -16,7 +16,27 @@
         "downlevelIteration": true,
         "baseUrl": "src",
         "paths": {
-            // TsconfigPathsPlugin usage here
+            "config/*": [
+                "config/*"
+            ],
+            "controller/*": [
+                "controller/*"
+            ],
+            "models/*": [
+                "models/*"
+            ],
+            "routers/*": [
+                "routers/*"
+            ],
+            "sockets/*": [
+                "sockets/*"
+            ],
+            "typings/*": [
+                "typings/*"
+            ],
+            "utils/*": [
+                "utils/*"
+            ],
         }
     },
     "include": [
