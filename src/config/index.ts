@@ -1,5 +1,5 @@
 export const CONFIG = {
-    ENV: 'development',
+    ENV: process.env.ENV,
     PORT: 5000,
     DATABASE_SERVER_URL: 'mongodb://127.0.0.1:27017/',
     BASE_DB_NAME: 'pos-core',
