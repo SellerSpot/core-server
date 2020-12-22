@@ -28,14 +28,14 @@
             "routers/*": [
                 "routers/*"
             ],
-            "sockets/*": [
-                "sockets/*"
+            "socketEventHandlers/*": [
+                "socketEventHandlers/*"
             ],
             "typings/*": [
                 "typings/*"
             ],
-            "utils/*": [
-                "utils/*"
+            "utilities/*": [
+                "utilities/*"
             ],
         }
     },

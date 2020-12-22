@@ -1,3 +1,5 @@
+import { connection } from 'mongoose';
+
 declare global {
     namespace NodeJS {
         interface ProcessEnv {
@@ -6,6 +8,11 @@ declare global {
             PWD: string;
             APP_NAME?: string;
             APP_VERSION?: string;
+        }
+
+        interface Global {
+            dbConnection: typeof connection;
+            currentDb: typeof connection;
         }
     }
 }
