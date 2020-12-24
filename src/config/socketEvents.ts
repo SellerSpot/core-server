@@ -6,4 +6,8 @@ export const SOCKET_EVENTS = {
     BASE: {
         HANDSHAKE: 'handshake',
     },
+    AUTH: {
+        SIGN_UP: 'signup',
+        SIGN_IN: 'signin',
+    },
 };
