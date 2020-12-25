@@ -4,40 +4,68 @@ import { TenantModel } from 'models';
 import { IResponse } from 'typings/request.types';
 
 export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse> => {
-    let response: IResponse = {
-        status: true,
-        statusCode: 200,
-        data: true,
+    const response: IResponse = {
+        status: false,
+        statusCode: 400,
+        data: null,
     };
     try {
+        const { email, name, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
         const TenantModel: TenantModel.ITentatModel = db.model(MONGOOSE_MODELS.TENANT);
-        const tenant = await TenantModel.create({
-            ...data,
-        });
+        if (!(await TenantModel.findOne({ email }))) {
+            const tenant = await TenantModel.create({
+                email,
+                name,
+                password,
+            });
+            response.status = true;
+            response.statusCode = 200;
+            response.data = tenant;
 
-        response.data = tenant;
-
-        return Promise.resolve(response);
-    } catch (error) {
-        response = {
-            status: false,
-            statusCode: 400,
-            data: [
+            return Promise.resolve(response);
+        } else {
+            response.data = [
                 {
-                    name: 'someting',
-                    message: error.message,
+                    name: `alreadyFound`,
+                    messaeg: `Account with the email id already exist!, please login with your email and password`,
                 },
-            ],
-        };
+            ];
+            throw response;
+        }
+    } catch (error) {
         return Promise.reject(response);
     }
 };
 
-export const SignInTenant = (): Promise<IResponse> => {
-    return Promise.resolve({
-        status: true,
-        statusCode: 200,
-        data: true,
-    });
+export const SignInTenant = async (
+    data: Pick<TenantModel.ITentat, 'email' | 'password'>,
+): Promise<IResponse> => {
+    const response: IResponse = {
+        status: false,
+        statusCode: 400,
+        data: null,
+    };
+    try {
+        const { email, password } = data;
+        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const TenantModel: TenantModel.ITentatModel = db.model(MONGOOSE_MODELS.TENANT);
+        const tenant = await TenantModel.findOne({ email, password });
+        if (tenant) {
+            response.status = true;
+            response.statusCode = 200;
+            response.data = tenant;
+            return Promise.resolve(response);
+        } else {
+            response.data = [
+                {
+                    name: `notFound`,
+                    messaeg: `We couldn't find the account!, please check the email or passowrd!`,
+                },
+            ];
+            throw response;
+        }
+    } catch (error) {
+        return Promise.reject(response);
+    }
 };
