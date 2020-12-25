@@ -1,7 +1,9 @@
 import { CONFIG } from 'config/index';
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
 import { TenantModel } from 'models';
-import { IResponse } from 'typings/request.types';
+import { IResponse, ITokenPayload } from 'typings/request.types';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse> => {
     const response: IResponse = {
@@ -17,12 +19,21 @@ export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse
             const tenant = await TenantModel.create({
                 email,
                 name,
-                password,
+                password: bcrypt.hashSync(password, 8),
             });
             response.status = true;
             response.statusCode = 200;
-            response.data = tenant;
-
+            const payload: ITokenPayload = {
+                id: tenant._id,
+                name: tenant.name,
+                email: tenant.email,
+            };
+            response.data = {
+                ...payload,
+                token: jwt.sign(payload, CONFIG.JWT_SECRET, {
+                    expiresIn: '2 days', // check zeit/ms
+                }),
+            };
             return Promise.resolve(response);
         } else {
             response.data = [
@@ -50,11 +61,21 @@ export const SignInTenant = async (
         const { email, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
         const TenantModel: TenantModel.ITentatModel = db.model(MONGOOSE_MODELS.TENANT);
-        const tenant = await TenantModel.findOne({ email, password });
-        if (tenant) {
+        const tenant = await TenantModel.findOne({ email });
+        if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
             response.statusCode = 200;
-            response.data = tenant;
+            const payload: ITokenPayload = {
+                id: tenant._id,
+                name: tenant.name,
+                email: tenant.email,
+            };
+            response.data = {
+                ...payload,
+                token: jwt.sign(payload, CONFIG.JWT_SECRET, {
+                    expiresIn: '2 days', // check zeit/ms
+                }),
+            };
             return Promise.resolve(response);
         } else {
             response.data = [
