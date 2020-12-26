@@ -5,6 +5,7 @@ import { IResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
+import { tenantController } from 'controllers';
 
 export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse> => {
     const response: IResponse = {
@@ -29,6 +30,12 @@ export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse
                 name: tenant.name,
                 email: tenant.email,
             };
+            // setting up tenant db for data isolation for the apps per tenant
+            setTimeout(() => {
+                // running asynchrously - if control over configuration is needed -  tenantController.setupTenant return a promise await and listen for response, response will be the type of IResponse
+                tenantController.setupTenant(payload);
+            });
+
             response.data = {
                 ...payload,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {

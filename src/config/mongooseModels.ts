@@ -1,4 +1,5 @@
 export const MONGOOSE_MODELS = {
     BASE: 'BASE',
     TENANT: 'TENANT',
+    TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
 };
