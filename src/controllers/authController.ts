@@ -4,6 +4,7 @@ import { TenantModel } from 'models';
 import { IResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Socket } from 'socket.io';
 
 export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse> => {
     const response: IResponse = {
@@ -88,5 +89,40 @@ export const SignInTenant = async (
         }
     } catch (error) {
         return Promise.reject(response);
+    }
+};
+
+export const verifyToken = async (socket: Socket): Promise<IResponse> => {
+    try {
+        const { token }: { token: string } = socket.handshake.auth as { token: string };
+        if (!token) {
+            throw 'tokenNotFound';
+        }
+        const response: IResponse = await new Promise((resolve, reject) =>
+            jwt.verify(token, CONFIG.JWT_SECRET, (err, decoded: ITokenPayload) => {
+                if (err) {
+                    reject('tokenExpired');
+                }
+                // on verificaiton success
+                resolve({
+                    status: true,
+                    statusCode: 200,
+                    data: decoded,
+                } as IResponse);
+            }),
+        );
+        return Promise.resolve(response);
+    } catch (error) {
+        return Promise.reject({
+            status: false,
+            statusCode: 401, // unauthorized
+            data: [
+                {
+                    name: error,
+                    message:
+                        'Auth token expired or not found! ReAuthenticate to refresh the token.',
+                },
+            ],
+        } as IResponse);
     }
 };

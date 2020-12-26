@@ -9,5 +9,6 @@ export const SOCKET_EVENTS = {
     AUTH: {
         SIGN_UP: 'signup',
         SIGN_IN: 'signin',
+        VERIFY_TOKEN: 'verifytoken',
     },
 };

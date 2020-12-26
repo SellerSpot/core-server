@@ -2,12 +2,11 @@ import express from 'express';
 import http from 'http';
 import { Server as SocketServer } from 'socket.io';
 import { CONFIG } from 'config';
-import { applyExpressMiddlewares } from 'config/expressConfig';
+import { applyExpressMiddlewares } from 'config/expressMiddlewares';
 import { logger } from 'utilities/logger';
 import { setSocketEventHandlers } from 'socketEventHandlers';
 import rootRouter from './routers';
 import { configureDB } from 'config/databaseConfig';
-import { verifyToken } from 'config/authJwt';
 
 // initializers
 const app = express();
@@ -17,17 +16,6 @@ const io: SocketServer = new SocketServer(httpServer, {
         origin: '*',
     },
 });
-
-const getData = async () => {
-    try {
-        const res = await verifyToken('some');
-        console.log(res);
-    } catch (error) {
-        console.log(error);
-    }
-};
-
-getData();
 
 // initialize mongoose and load models (different from traditional way - that this structure is optimzed of multi-tenant ecosystem)
 configureDB();

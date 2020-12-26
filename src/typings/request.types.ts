@@ -14,8 +14,3 @@ export interface ITokenPayload {
     name: string;
     email: string;
 }
-
-export interface IJwtVerficationPayload {
-    status: boolean;
-    data: ITokenPayload | TErrorResponse;
-}
