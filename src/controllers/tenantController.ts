@@ -1,15 +1,15 @@
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { ITentat } from 'models/Tenant';
-import { ITentatHandshakeModel } from 'models/TenantHandshake';
+import { ITenant } from 'models/Tenant';
+import { ITenantHandshakeModel } from 'models/TenantHandshake';
 import { IResponse } from 'typings/request.types';
 
 export const setupTenant = async (
-    tenantData: Pick<ITentat, 'name' | 'email'> & { id: string },
+    tenantData: Pick<ITenant, 'name' | 'email'> & { id: string },
 ): Promise<IResponse> => {
     try {
         if (tenantData.id) {
             const db = global.currentDb.useDb(tenantData.id.toString()); // id comes and mongoose id to converted to  string
-            const TentatHandshakeModel: ITentatHandshakeModel = db.model(
+            const TentatHandshakeModel: ITenantHandshakeModel = db.model(
                 MONGOOSE_MODELS.TENANT_HANDSHAKE,
             );
             const tenantHandshake = await TentatHandshakeModel.create({

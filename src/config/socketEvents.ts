@@ -11,4 +11,9 @@ export const SOCKET_EVENTS = {
         SIGN_IN: 'signin',
         VERIFY_TOKEN: 'verifytoken',
     },
+    SUB_DOMAIN: {
+        CREATE_SUB_DOMAIN: 'createsubdomain',
+        UPDATE_SUB_DOMAIN: 'updatesubdomain',
+        SUB_DOMAIN_AVAILABILITY_CHECK: 'subdomainavailabilitycheck',
+    },
 };

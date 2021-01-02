@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { logger } from 'utilities/logger';
-import { CONFIG } from '.';
+import { CONFIG } from './config';
 import * as models from 'models';
 
 export const configureDB = (): void => {

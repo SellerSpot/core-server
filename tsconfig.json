@@ -28,8 +28,8 @@
             "routers/*": [
                 "routers/*"
             ],
-            "socketEventHandlers/*": [
-                "socketEventHandlers/*"
+            "sockets/*": [
+                "sockets/*"
             ],
             "typings/*": [
                 "typings/*"

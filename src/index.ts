@@ -1,10 +1,10 @@
 import express from 'express';
 import http from 'http';
 import { Server as SocketServer } from 'socket.io';
-import { CONFIG } from 'config';
+import { CONFIG } from 'config/config';
 import { applyExpressMiddlewares } from 'config/expressMiddlewares';
 import { logger } from 'utilities/logger';
-import { setSocketEventHandlers } from 'socketEventHandlers';
+import { setSocketEventHandlers } from 'sockets/sockets';
 import rootRouter from './routers';
 import { configureDB } from 'config/databaseConfig';
 

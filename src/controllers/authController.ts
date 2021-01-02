@@ -1,4 +1,4 @@
-import { CONFIG } from 'config/index';
+import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
 import { TenantModel } from 'models';
 import { IResponse, ITokenPayload } from 'typings/request.types';
@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
 import { tenantController } from 'controllers';
 
-export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse> => {
+export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse> => {
     const response: IResponse = {
         status: false,
         statusCode: 400,
@@ -16,7 +16,7 @@ export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse
     try {
         const { email, name, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
-        const TenantModel: TenantModel.ITentatModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
         if (!(await TenantModel.findOne({ email }))) {
             const tenant = await TenantModel.create({
                 email,
@@ -38,6 +38,7 @@ export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse
 
             response.data = {
                 ...payload,
+                subDomain: null,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),
@@ -58,7 +59,7 @@ export const SignUpTenant = async (data: TenantModel.ITentat): Promise<IResponse
 };
 
 export const SignInTenant = async (
-    data: Pick<TenantModel.ITentat, 'email' | 'password'>,
+    data: Pick<TenantModel.ITenant, 'email' | 'password'>,
 ): Promise<IResponse> => {
     const response: IResponse = {
         status: false,
@@ -68,8 +69,12 @@ export const SignInTenant = async (
     try {
         const { email, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
-        const TenantModel: TenantModel.ITentatModel = db.model(MONGOOSE_MODELS.TENANT);
-        const tenant = await TenantModel.findOne({ email });
+        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const tenant = await TenantModel.findOne({ email }).populate(
+            'subDomain',
+            null,
+            MONGOOSE_MODELS.SUB_DOMAIN,
+        );
         if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
             response.statusCode = 200;
@@ -80,6 +85,7 @@ export const SignInTenant = async (
             };
             response.data = {
                 ...payload,
+                subDomain: tenant.subDomain,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),

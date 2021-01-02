@@ -5,14 +5,16 @@ const TenantSchema = new Schema({
     name: String,
     email: String,
     password: String,
+    subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT },
 });
 
-export interface ITentat {
+export interface ITenant {
     name: string;
     email: string;
     password: string;
+    subDomain?: string;
 }
 
-export type ITentatModel = Model<ITentat & Document>;
+export type ITenantModel = Model<ITenant & Document>;
 
-export const BaseModel: ITentatModel = model(MONGOOSE_MODELS.TENANT, TenantSchema);
+export const TenantModel: ITenantModel = model(MONGOOSE_MODELS.TENANT, TenantSchema);

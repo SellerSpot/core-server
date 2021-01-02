@@ -7,15 +7,15 @@ const TenantHandshake = new Schema({
     email: String,
 });
 
-export interface ITentatHandshake {
+export interface ITenantHandshake {
     tenantId: string;
     name: string;
     email: string;
 }
 
-export type ITentatHandshakeModel = Model<ITentatHandshake & Document>;
+export type ITenantHandshakeModel = Model<ITenantHandshake & Document>;
 
-export const BaseModel: ITentatHandshakeModel = model(
+export const BaseModel: ITenantHandshakeModel = model(
     MONGOOSE_MODELS.TENANT_HANDSHAKE,
     TenantHandshake,
 );
