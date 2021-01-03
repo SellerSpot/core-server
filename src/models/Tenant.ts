@@ -6,6 +6,7 @@ const TenantSchema = new Schema({
     email: String,
     password: String,
     subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT },
+    apps: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.APP }],
 });
 
 export interface ITenant {
@@ -13,6 +14,7 @@ export interface ITenant {
     email: string;
     password: string;
     subDomain?: string;
+    apps?: string[];
 }
 
 export type ITenantModel = Model<ITenant & Document>;

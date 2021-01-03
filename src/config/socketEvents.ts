@@ -16,4 +16,13 @@ export const SOCKET_EVENTS = {
         UPDATE_SUB_DOMAIN: 'updatesubdomain',
         SUB_DOMAIN_AVAILABILITY_CHECK: 'subdomainavailabilitycheck',
     },
+    APP: {
+        GET_ALL_APPS: 'getallapps',
+        GET_APP_BY_ID: 'getappbyid',
+        INSTALL: 'installapp',
+        UNINSTALL: 'uninstallapp',
+        ADMIN_CREATE_APP: 'admincreateapp',
+        ADMIN_DELETE_APP: 'admindelteapp',
+        ADMIN_UPDATE_APP: 'adminupdateapp',
+    },
 };
