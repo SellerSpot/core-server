@@ -50,6 +50,33 @@ const appEvents = (io: Server, socket: Socket): void => {
         callback(response);
     });
 
+    // get tenant installed apps using tenant id
+    socket.on(SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APPS, async (_data, callback) => {
+        logger(
+            'socketio',
+            `Event: ${SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APPS}, ${typeof callback}`,
+        );
+        let response: IResponse;
+        try {
+            const token = await authController.verifyToken(socket);
+            if (!token.status) throw token;
+            response = await appController.getTenantInstalledApps({
+                tenantId: (<ITokenPayload>token.data).id,
+            });
+        } catch (error) {
+            if (error.status !== undefined) {
+                response = error;
+            } else {
+                response = {
+                    status: false,
+                    statusCode: 500,
+                    data: 'Internal Server Error!',
+                };
+            }
+        }
+        callback(response);
+    });
+
     // install app
     socket.on(SOCKET_EVENTS.APP.INSTALL, async (data: { appId: string }, callback) => {
         logger('socketio', `Event: ${SOCKET_EVENTS.APP.INSTALL}, ${JSON.stringify(data)}`);

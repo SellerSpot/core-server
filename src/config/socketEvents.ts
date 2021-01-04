@@ -19,6 +19,7 @@ export const SOCKET_EVENTS = {
     APP: {
         GET_ALL_APPS: 'getallapps',
         GET_APP_BY_ID: 'getappbyid',
+        GET_TENANT_INSTALLED_APPS: 'gettenantinstalledapps',
         INSTALL: 'installapp',
         UNINSTALL: 'uninstallapp',
         ADMIN_CREATE_APP: 'admincreateapp',

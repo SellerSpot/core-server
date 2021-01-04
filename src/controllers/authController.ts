@@ -70,11 +70,9 @@ export const SignInTenant = async (
         const { email, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
         const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
-        const tenant = await TenantModel.findOne({ email }).populate(
-            'subDomain',
-            null,
-            MONGOOSE_MODELS.SUB_DOMAIN,
-        );
+        const tenant = await TenantModel.findOne({ email })
+            .populate('subDomain', null, MONGOOSE_MODELS.SUB_DOMAIN)
+            .populate('apps', null, MONGOOSE_MODELS.APP);
         if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
             response.statusCode = 200;
@@ -86,6 +84,7 @@ export const SignInTenant = async (
             response.data = {
                 ...payload,
                 subDomain: tenant.subDomain,
+                apps: tenant.apps,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),

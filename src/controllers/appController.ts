@@ -66,6 +66,38 @@ export const getAppById = async (appId: string): Promise<IResponse> => {
     }
 };
 
+// get user installed apps
+export const getTenantInstalledApps = async (data: { tenantId: string }): Promise<IResponse> => {
+    try {
+        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+
+        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const tenant = await TenantModel.findById(data.tenantId).populate(
+            'apps',
+            null,
+            MONGOOSE_MODELS.APP,
+        );
+        if (!tenant) throw 'Not found the requested Tenant!';
+
+        return Promise.resolve({
+            status: true,
+            statusCode: 200,
+            data: tenant.apps,
+        });
+    } catch (error) {
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'appInstallationFailure',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
+    }
+};
+
 // install app
 export const installApp = async (data: { appId: string; tenantId: string }): Promise<IResponse> => {
     try {
@@ -90,14 +122,7 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
         await tenant.save();
 
         // in future we need to move it to many to one relation (every app will contain collection, each entry will be installed as instace entry, which prevents the users's document to exceeds 36mb )
-
-        return Promise.resolve({
-            status: true,
-            statusCode: 200,
-            data: await TenantModel.findById(tenantId)
-                .select({ apps: 0 })
-                .populate('apps', null, MONGOOSE_MODELS.APP),
-        });
+        return await getTenantInstalledApps({ tenantId });
     } catch (error) {
         return Promise.reject({
             status: false,
@@ -137,13 +162,7 @@ export const unInstallApp = async (data: {
 
         // in future we need to move it to many to one relation (every app will contain collection, each entry will be installed as instace entry, which prevents the users's document to exceeds 36mb )
 
-        return Promise.resolve({
-            status: true,
-            statusCode: 200,
-            data: await TenantModel.findById(tenantId)
-                .select({ apps: 0 })
-                .populate('apps', null, MONGOOSE_MODELS.APP),
-        });
+        return await getTenantInstalledApps({ tenantId });
     } catch (error) {
         return Promise.reject({
             status: false,
