@@ -1,5 +1,5 @@
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { Schema, model, Model, Document } from 'mongoose';
+import { Schema, model, Model, Document, Types } from 'mongoose';
 
 const AppSchema = new Schema(
     {
@@ -17,7 +17,7 @@ const AppSchema = new Schema(
 );
 
 export interface IApp {
-    _id?: string;
+    _id?: string | Types.ObjectId;
     name?: string;
     shortDescription?: string;
     longDescription?: string;

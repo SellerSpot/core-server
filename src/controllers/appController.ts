@@ -3,6 +3,8 @@ import { MONGOOSE_MODELS } from 'config/mongooseModels';
 import { AppModel, TenantModel } from 'models';
 import { IResponse } from 'typings/request.types';
 import { IApp } from 'models/App';
+import lodash from 'lodash';
+import mongoose from 'mongoose';
 
 /* tenant interaction controllers */
 
@@ -66,7 +68,64 @@ export const getAppById = async (appId: string): Promise<IResponse> => {
     }
 };
 
-// get user installed apps
+// get tenant installed app by id
+// get app by id
+export const getTenantInstalledAppById = async ({
+    appId,
+    tenantId,
+}: {
+    appId: string;
+    tenantId: string;
+}): Promise<IResponse> => {
+    try {
+        if (!appId || !tenantId) throw 'Ivalid request body! appid and tenantid needed!';
+
+        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+
+        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+
+        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+
+        const tenant = await TenantModel.findById(tenantId).populate(
+            'apps',
+            null,
+            MONGOOSE_MODELS.APP,
+        );
+
+        if (!tenant) throw 'requested tenant not found!';
+
+        if (!tenant.apps) throw 'No apps installed';
+
+        const tenantInstalledApps = tenant.apps as IApp[];
+
+        const requestedAppIndex = lodash.findIndex(tenantInstalledApps, {
+            _id: mongoose.Types.ObjectId(appId),
+        });
+
+        if (requestedAppIndex < 0) throw 'Requested App not installed!';
+
+        const requestedApp = tenantInstalledApps[requestedAppIndex];
+
+        return Promise.resolve({
+            status: true,
+            statusCode: 200,
+            data: requestedApp,
+        });
+    } catch (error) {
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'tenantInstalledAppGetByIdFailure',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
+    }
+};
+
+// get tenant installed apps
 export const getTenantInstalledApps = async (data: { tenantId: string }): Promise<IResponse> => {
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
