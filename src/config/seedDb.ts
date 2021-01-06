@@ -23,7 +23,7 @@ export const seedAppCollection = async (): Promise<void> => {
             try {
                 await appController.adminCreateNewApp(app);
             } catch (error) {
-                console.log(`Seed App ${app.name} already in collection.`);
+                logger('mongoose', `Seed App ${app.name} already in collection.`);
             }
         });
         logger('mongoose', 'seeing app collection done.');

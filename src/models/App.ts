@@ -4,6 +4,7 @@ import { Schema, model, Model, Document, Types } from 'mongoose';
 const AppSchema = new Schema(
     {
         name: String,
+        slug: String,
         shortDescription: String,
         longDescription: String,
         iconUrl: String,
@@ -19,6 +20,7 @@ const AppSchema = new Schema(
 export interface IApp {
     _id?: string | Types.ObjectId;
     name?: string;
+    slug?: string;
     shortDescription?: string;
     longDescription?: string;
     iconUrl?: string;

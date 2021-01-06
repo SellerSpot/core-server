@@ -4,7 +4,7 @@ import { AppModel, TenantModel } from 'models';
 import { IResponse } from 'typings/request.types';
 import { IApp } from 'models/App';
 import lodash from 'lodash';
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 /* tenant interaction controllers */
 
@@ -39,14 +39,19 @@ export const getAllApps = async (): Promise<IResponse> => {
     }
 };
 
-// get app by id
-export const getAppById = async (appId: string): Promise<IResponse> => {
+// get app by id / also by slug name
+export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promise<IResponse> => {
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
         const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
 
-        const app = await AppModel.findById(appId);
+        let app: Document;
+        if (isSlug) {
+            app = await AppModel.findOne({ slug: idOrSlug });
+        } else {
+            app = await AppModel.findById(idOrSlug);
+        }
         if (!app) throw 'requested app not found!';
 
         return Promise.resolve({
@@ -70,21 +75,25 @@ export const getAppById = async (appId: string): Promise<IResponse> => {
 
 // get tenant installed app by id
 // get app by id
-export const getTenantInstalledAppById = async ({
-    appId,
-    tenantId,
-}: {
-    appId: string;
-    tenantId: string;
-}): Promise<IResponse> => {
+export const getTenantInstalledAppByIdOrSlug = async (
+    {
+        appIdOrSlug,
+        tenantId,
+    }: {
+        appIdOrSlug: string;
+        tenantId: string;
+    },
+    isSlug = false,
+): Promise<IResponse> => {
     try {
-        if (!appId || !tenantId) throw 'Ivalid request body! appid and tenantid needed!';
+        if (!appIdOrSlug || !tenantId)
+            throw 'Ivalid request body! appIdOrSlug and tenantid needed!';
 
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
         const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
 
         const tenant = await TenantModel.findById(tenantId).populate(
             'apps',
@@ -98,9 +107,15 @@ export const getTenantInstalledAppById = async ({
 
         const tenantInstalledApps = tenant.apps as IApp[];
 
-        const requestedAppIndex = lodash.findIndex(tenantInstalledApps, {
-            _id: mongoose.Types.ObjectId(appId),
-        });
+        const findIndexQuery = !isSlug
+            ? {
+                  _id: mongoose.Types.ObjectId(appIdOrSlug),
+              }
+            : {
+                  slug: appIdOrSlug.toString(),
+              };
+
+        const requestedAppIndex = lodash.findIndex(tenantInstalledApps, findIndexQuery);
 
         if (requestedAppIndex < 0) throw 'Requested App not installed!';
 
@@ -117,7 +132,7 @@ export const getTenantInstalledAppById = async ({
             statusCode: 400,
             data: [
                 {
-                    name: 'tenantInstalledAppGetByIdFailure',
+                    name: 'tenantInstalledAppGetByIdOrSlugFailure',
                     message: error.message ?? error,
                 },
             ],
@@ -246,6 +261,9 @@ export const adminCreateNewApp = async (data: IApp): Promise<IResponse> => {
 
         if ((await AppModel.find({ name: data.name })).length !== 0)
             throw 'App with the Same name already available!';
+
+        // creating slug for url tracing (readability)
+        data.slug = data.name.toLowerCase().split(' ').join('-');
 
         const app = await AppModel.create({
             ...data,
