@@ -10,6 +10,7 @@ export const SOCKET_EVENTS = {
         SIGN_UP: 'signup',
         SIGN_IN: 'signin',
         VERIFY_TOKEN: 'verifytoken',
+        DELETE_TENANT_ACCOUNT: 'deleteTenantAccount',
     },
     SUB_DOMAIN: {
         CREATE_SUB_DOMAIN: 'createsubdomain',
