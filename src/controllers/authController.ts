@@ -55,7 +55,7 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
             response.data = [
                 {
                     name: `alreadyFound`,
-                    messaeg: `Account with the email id already exist!, please login with your email and password`,
+                    message: `Account with the email id already exist!, please login with your email and password`,
                 },
             ];
             throw response;
@@ -117,7 +117,7 @@ export const SignInTenant = async (
             response.data = [
                 {
                     name: `notFound`,
-                    messaeg: `We couldn't find the account!, please check the email or passowrd!`,
+                    message: `We couldn't find the account!, please check the email or passowrd!`,
                 },
             ];
             throw response;
