@@ -15,6 +15,7 @@ export const SOCKET_EVENTS = {
     SUB_DOMAIN: {
         CREATE_SUB_DOMAIN: 'createsubdomain',
         UPDATE_SUB_DOMAIN: 'updatesubdomain',
+        DELETE_SUB_DOMAIN: 'deletesubdomain',
         SUB_DOMAIN_AVAILABILITY_CHECK: 'subdomainavailabilitycheck',
     },
     APP: {

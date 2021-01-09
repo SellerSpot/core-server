@@ -1,7 +1,7 @@
 import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { TenantModel } from 'models';
-import { IResponse, ITokenPayload } from 'typings/request.types';
+import { SubDomainModel, TenantModel } from 'models';
+import { IResponse, ISubDomainResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
@@ -38,7 +38,14 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
 
             response.data = {
                 ...payload,
-                subDomain: null,
+                subDomain: {
+                    _id: '',
+                    baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
+                    createdAt: '',
+                    domainName: '',
+                    tenantId: tenant._id,
+                    updatedAt: '',
+                } as ISubDomainResponse,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),
@@ -81,9 +88,25 @@ export const SignInTenant = async (
                 name: tenant.name,
                 email: tenant.email,
             };
+            const subDomainDetails = <SubDomainModel.ISubDomain>tenant.subDomain ?? {
+                domainName: '',
+                tenantId: tenant._id,
+                _id: '',
+                createdAt: '',
+                updatedAt: '',
+            };
             response.data = {
                 ...payload,
-                subDomain: tenant.subDomain,
+                subDomain: {
+                    ...(<SubDomainModel.ISubDomain>{
+                        _id: subDomainDetails._id,
+                        domainName: subDomainDetails.domainName,
+                        tenantId: subDomainDetails.tenantId,
+                        createdAt: subDomainDetails.createdAt,
+                        updatedAt: subDomainDetails.updatedAt,
+                    }),
+                    baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
+                } as ISubDomainResponse,
                 apps: tenant.apps,
                 token: jwt.sign(payload, CONFIG.JWT_SECRET, {
                     expiresIn: '2 days', // check zeit/ms

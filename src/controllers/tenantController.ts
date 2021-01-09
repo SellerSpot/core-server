@@ -45,6 +45,7 @@ export const setupTenant = async (
 
 /**
  * deletes a tenant
+ * todo - need to delete the subdomain of the particular tenant
  */
 export const deleteTenant = async ({ tenantId }: { tenantId: string }): Promise<IResponse> => {
     try {

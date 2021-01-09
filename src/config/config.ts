@@ -5,4 +5,5 @@ export const CONFIG = {
     BASE_DB_NAME: 'sellerspot-core',
     GET_DATABASE_CONNECTION_URL: (): string => CONFIG.DATABASE_SERVER_URL + CONFIG.BASE_DB_NAME,
     JWT_SECRET: 'sellerspot_ecosystem',
+    CLIENT_BASE_DOMAIN_FOR_APPS: 'sellerspot.in',
 };

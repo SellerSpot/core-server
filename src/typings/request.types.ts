@@ -14,3 +14,12 @@ export interface ITokenPayload {
     name: string;
     email: string;
 }
+
+export interface ISubDomainResponse {
+    createdAt: string;
+    domainName: string;
+    tenantId: string;
+    updatedAt: string;
+    _id: string;
+    baseDomain: string;
+}

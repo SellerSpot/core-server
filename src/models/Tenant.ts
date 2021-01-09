@@ -1,5 +1,6 @@
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
+import { SubDomainModel } from '.';
 
 const TenantSchema = new Schema({
     name: String,
@@ -13,7 +14,7 @@ export interface ITenant {
     name: string;
     email: string;
     password: string;
-    subDomain?: string;
+    subDomain?: string | SubDomainModel.ISubDomain;
     apps?: string[];
 }
 

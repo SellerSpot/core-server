@@ -61,6 +61,33 @@ const subDomainEvents = (io: Server, socket: Socket): void => {
         callback(response);
     });
 
+    // delete subdomain
+    socket.on(SOCKET_EVENTS.SUB_DOMAIN.DELETE_SUB_DOMAIN, async (_data, callback) => {
+        logger(
+            'socketio',
+            `Event: ${SOCKET_EVENTS.SUB_DOMAIN.DELETE_SUB_DOMAIN}, ${typeof callback}`,
+        );
+        let response: IResponse;
+        try {
+            const token = await authController.verifyToken(socket);
+            if (!token.status) throw token;
+            response = await subDomainController.deleteSubDomain({
+                tenantId: (<ITokenPayload>token.data).id,
+            });
+        } catch (error) {
+            if (error.status !== undefined) {
+                response = error;
+            } else {
+                response = {
+                    status: false,
+                    statusCode: 500,
+                    data: 'Internal Server Error!',
+                };
+            }
+        }
+        callback(response);
+    });
+
     // subdomain availability check
     socket.on(SOCKET_EVENTS.SUB_DOMAIN.SUB_DOMAIN_AVAILABILITY_CHECK, async (data, callback) => {
         logger(

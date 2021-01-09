@@ -10,9 +10,11 @@ const SubDomainSchema = new Schema(
 );
 
 export interface ISubDomain {
-    id?: string;
     domainName: string;
     tenantId: string;
+    _id?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type ISubDomainModel = Model<ISubDomain & Document>;
