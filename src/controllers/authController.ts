@@ -52,7 +52,7 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
             };
             return Promise.resolve(response);
         } else {
-            throw `Account with the email id already exist!, please login with your email and password`;
+            throw `Account with the email id already exist!, please login with your email id and password`;
         }
     } catch (error) {
         return Promise.reject({
@@ -83,7 +83,7 @@ export const SignInTenant = async (
         const tenant = await TenantModel.findOne({ email })
             .populate('subDomain', null, MONGOOSE_MODELS.SUB_DOMAIN)
             .populate('apps', null, MONGOOSE_MODELS.APP);
-        if (!tenant) throw `We couldn't find the account!, please check Your Email!`;
+        if (!tenant) throw `We couldn't find the account!, please check Your Email Id!`;
         if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
             response.statusCode = 200;
