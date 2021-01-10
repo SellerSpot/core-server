@@ -1,4 +1,5 @@
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
+import { string } from 'joi';
 import { Schema, model, Model, Document, Types } from 'mongoose';
 
 const AppSchema = new Schema(
@@ -13,6 +14,7 @@ const AppSchema = new Schema(
                 type: String,
             },
         ],
+        domainName: String,
     },
     { timestamps: true },
 );
@@ -25,6 +27,7 @@ export interface IApp {
     longDescription?: string;
     iconUrl?: string;
     bannerImages?: string[];
+    domainName?: string;
     createdAt?: string;
     updatedAt?: string;
 }

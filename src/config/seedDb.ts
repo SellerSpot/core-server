@@ -17,6 +17,7 @@ export const seedAppCollection = async (): Promise<void> => {
                     'https://cdn.dribbble.com/users/2085056/screenshots/6559902/untill_shot1-2_4x.png?compress=1&resize=400x300',
                     'https://images.ctfassets.net/2d5q1td6cyxq/6yg3hIlsKoloiGpiwTqcih/39044a394afef4493e5f1c2edb9fd791/PD01142_-_US_dashboard_social.png?w=1200&h=630&fm=jpg&q=90&fit=thumb',
                 ],
+                domainName: 'pos',
             },
         ];
         apps.map(async (app) => {

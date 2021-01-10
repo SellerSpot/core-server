@@ -71,7 +71,10 @@ export const updateSubDomain = async (
         if ((await SubDomainModel.find({ domainName: data.domainName })).length)
             throw 'Domain Not Available! Try alternate domain!';
 
-        subDomain.domainName = data.domainName;
+        subDomain.domainName = data.domainName
+            .replace(/[^a-zA-Z]+/g, '')
+            .trim()
+            .toLowerCase();
 
         await subDomain.save();
 
@@ -139,7 +142,10 @@ export const checkSubDomainAvailability = async (domainName: string): Promise<IR
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME); // id comes and mongoose id to converted to  string
         const SubDomainModel: ISubDomainModel = db.model(MONGOOSE_MODELS.SUB_DOMAIN);
-        const isAvailable = (await SubDomainModel.find({ domainName })).length === 0;
+        const isAvailable =
+            domainName.length >= 3 &&
+            domainName.length <= 15 &&
+            (await SubDomainModel.find({ domainName: domainName })).length === 0;
         // domian suggestion can be given here in future iteration
         return Promise.resolve({
             status: true,
