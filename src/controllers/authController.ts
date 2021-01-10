@@ -52,16 +52,19 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
             };
             return Promise.resolve(response);
         } else {
-            response.data = [
-                {
-                    name: `alreadyFound`,
-                    message: `Account with the email id already exist!, please login with your email and password`,
-                },
-            ];
-            throw response;
+            throw `Account with the email id already exist!, please login with your email and password`;
         }
     } catch (error) {
-        return Promise.reject(response);
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'alreadyFound',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
     }
 };
 
@@ -80,6 +83,7 @@ export const SignInTenant = async (
         const tenant = await TenantModel.findOne({ email })
             .populate('subDomain', null, MONGOOSE_MODELS.SUB_DOMAIN)
             .populate('apps', null, MONGOOSE_MODELS.APP);
+        if (!tenant) throw `We couldn't find the account!, please check Your Email!`;
         if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
             response.statusCode = 200;
@@ -114,16 +118,19 @@ export const SignInTenant = async (
             };
             return Promise.resolve(response);
         } else {
-            response.data = [
-                {
-                    name: `notFound`,
-                    message: `We couldn't find the account!, please check the email or passowrd!`,
-                },
-            ];
-            throw response;
+            throw `Your Password is Incorrect!`;
         }
     } catch (error) {
-        return Promise.reject(response);
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'notFound',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
     }
 };
 
