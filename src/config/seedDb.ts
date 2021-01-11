@@ -32,7 +32,7 @@ export const seedAppCollection = async (): Promise<void> => {
     } catch (error) {}
 };
 
-export const reservedDomainCollection = async (): Promise<void> => {
+export const seedReservedDomainCollection = async (): Promise<void> => {
     try {
         logger('mongoose', 'Seeding Reserved domain collection.');
         const reservedDomains: IReservedDomain[] = [
@@ -107,6 +107,6 @@ export const reservedDomainCollection = async (): Promise<void> => {
                 );
             }
         });
-        logger('mongoose', 'seeing reserved domain collection done.');
+        logger('mongoose', 'seeding reserved domain collection done.');
     } catch (error) {}
 };

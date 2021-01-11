@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import { logger } from 'utilities/logger';
 import { CONFIG } from './config';
 import * as models from 'models';
-import { seedAppCollection } from './seedDb';
+import { seedAppCollection, seedReservedDomainCollection } from './seedDb';
 
 export const configureDB = (): void => {
     global.dbConnection = mongoose.createConnection(CONFIG.GET_DATABASE_CONNECTION_URL(), {
@@ -18,6 +18,7 @@ export const configureDB = (): void => {
         logger('mongoose', `database: Connected to ${CONFIG.BASE_DB_NAME}`);
         // database seed operations goes here
         seedAppCollection();
+        seedReservedDomainCollection();
     });
     global.currentDb = global.dbConnection.useDb(CONFIG.BASE_DB_NAME);
     if (models.handshake === true) logger('mongoose', `Loaded All Monogoose Models`);

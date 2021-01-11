@@ -1,5 +1,6 @@
 import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'config/mongooseModels';
+import { IReservedDomainModel } from 'models/ReservedDomain';
 import { ISubDomain, ISubDomainModel } from 'models/SubDomain';
 import { ITenantModel } from 'models/Tenant';
 import { domain } from 'process';
@@ -12,19 +13,32 @@ export const createSubDomain = async (
         if (!data.tenantId) throw 'Invalid data';
         if (data.domainName && (data.domainName.length < 3 || data.domainName.length > 15))
             throw 'domain name length exceeded, domain name should be minimum of 3 and maximum of 10 characters';
+
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME); // id comes and mongoose id to converted to  string
         const TenantModel: ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
         const tenant = await TenantModel.findById(data.tenantId);
         if (!tenant) throw 'Invalid Tenant';
+
         const SubDomainModel: ISubDomainModel = db.model(MONGOOSE_MODELS.SUB_DOMAIN);
         if ((await SubDomainModel.find({ domainName: data.domainName })).length)
             throw 'Domain Not Available! Try alternate domain!';
+
+        const ReservedDomainModel: IReservedDomainModel = db.model(MONGOOSE_MODELS.RESERVED_DOMAIN);
+        if ((await ReservedDomainModel.find({ name: data.domainName })).length)
+            throw 'Domain Not Available! Try alternate domain!';
+
+        const sanitizedDomainName = data.domainName
+            .replace(/[^a-zA-Z]+/g, '')
+            .trim()
+            .toLowerCase();
+
         const subDomain = await SubDomainModel.create({
-            domainName: data.domainName,
+            domainName: sanitizedDomainName,
             tenantId: data.tenantId,
         });
         tenant.subDomain = subDomain.id;
         await tenant.save();
+
         return Promise.resolve({
             status: true,
             statusCode: 200,
@@ -71,24 +85,21 @@ export const updateSubDomain = async (
         if ((await SubDomainModel.find({ domainName: data.domainName })).length)
             throw 'Domain Not Available! Try alternate domain!';
 
-        subDomain.domainName = data.domainName
-            .replace(/[^a-zA-Z]+/g, '')
-            .trim()
-            .toLowerCase();
+        const ReservedDomainModel: IReservedDomainModel = db.model(MONGOOSE_MODELS.RESERVED_DOMAIN);
+        if ((await ReservedDomainModel.find({ name: data.domainName })).length)
+            throw 'Domain Not Available! Try alternate domain!';
 
-        await subDomain.save();
+        await deleteSubDomain({ tenantId: data.tenantId });
+
+        const createSubDomainResponse = await createSubDomain({
+            domainName: data.domainName,
+            tenantId: data.tenantId,
+        });
 
         return {
             status: true,
             statusCode: 200,
-            data: {
-                _id: subDomain.id,
-                baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
-                createdAt: subDomain.createdAt,
-                updatedAt: subDomain.updatedAt,
-                domainName: subDomain.domainName,
-                tenantId: subDomain.tenantId,
-            } as ISubDomainResponse,
+            data: createSubDomainResponse.data as ISubDomainResponse,
         };
     } catch (error) {
         return Promise.reject({
@@ -142,10 +153,12 @@ export const checkSubDomainAvailability = async (domainName: string): Promise<IR
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME); // id comes and mongoose id to converted to  string
         const SubDomainModel: ISubDomainModel = db.model(MONGOOSE_MODELS.SUB_DOMAIN);
+        const ReservedDomainModel: IReservedDomainModel = db.model(MONGOOSE_MODELS.RESERVED_DOMAIN);
         const isAvailable =
             domainName.length >= 3 &&
             domainName.length <= 15 &&
-            (await SubDomainModel.find({ domainName: domainName })).length === 0;
+            (await SubDomainModel.find({ domainName: domainName })).length === 0 &&
+            (await ReservedDomainModel.find({ name: domainName })).length === 0;
         // domian suggestion can be given here in future iteration
         return Promise.resolve({
             status: true,

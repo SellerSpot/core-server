@@ -5,7 +5,7 @@ export const MONGOOSE_MODELS = {
     SUB_DOMAIN: 'SUB_DOMAIN',
     APP: 'APP',
     PLUGIN: 'PLUGIN',
-    RESERVED_DOMAIN: 'PLUGIN',
+    RESERVED_DOMAIN: 'RESERVED_DOMAIN',
     /* TenantHandshake db */
     TENANT_HANDSHAKE: 'TENANT_HANDSHAKE',
 };
