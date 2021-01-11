@@ -3,3 +3,4 @@ export * as authController from './authController';
 export * as tenantController from './tenantController';
 export * as subDomainController from './subDomainController';
 export * as appController from './appController';
+export * as reservedDomainController from './reservedDomainController';

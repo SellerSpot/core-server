@@ -164,7 +164,7 @@ export const getTenantInstalledApps = async (data: { tenantId: string }): Promis
             statusCode: 400,
             data: [
                 {
-                    name: 'appInstallationFailure',
+                    name: 'installedAppGetFailure',
                     message: error.message ?? error,
                 },
             ],
@@ -280,7 +280,7 @@ export const adminCreateNewApp = async (data: IApp): Promise<IResponse> => {
             statusCode: 400,
             data: [
                 {
-                    name: 'appUninstallFailure',
+                    name: 'adminAppCreateFailure',
                     message: error.message ?? error,
                 },
             ],
@@ -309,7 +309,7 @@ export const adminDeleteApp = async (appId: string): Promise<IResponse> => {
             statusCode: 400,
             data: [
                 {
-                    name: 'appUninstallFailure',
+                    name: 'adminAppDeleteFailure',
                     message: error.message ?? error,
                 },
             ],

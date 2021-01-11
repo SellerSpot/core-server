@@ -1,5 +1,6 @@
-import { appController } from 'controllers';
+import { appController, reservedDomainController } from 'controllers';
 import { IApp } from 'models/App';
+import { IReservedDomain } from 'models/ReservedDomain';
 import { logger } from 'utilities/logger';
 
 export const seedAppCollection = async (): Promise<void> => {
@@ -28,5 +29,84 @@ export const seedAppCollection = async (): Promise<void> => {
             }
         });
         logger('mongoose', 'seeing app collection done.');
+    } catch (error) {}
+};
+
+export const reservedDomainCollection = async (): Promise<void> => {
+    try {
+        logger('mongoose', 'Seeding Reserved domain collection.');
+        const reservedDomains: IReservedDomain[] = [
+            {
+                name: 'admin',
+            },
+            {
+                name: 'administrator',
+            },
+            {
+                name: 'administration',
+            },
+            {
+                name: 'administration',
+            },
+            {
+                name: 'sellerspot',
+            },
+            {
+                name: 'com',
+            },
+            {
+                name: 'org',
+            },
+            {
+                name: 'ecommerce',
+            },
+            {
+                name: 'ecom',
+            },
+            {
+                name: 'pos',
+            },
+            {
+                name: 'pointofsale',
+            },
+            {
+                name: 'dashboard',
+            },
+            {
+                name: 'control',
+            },
+            {
+                name: 'hack',
+            },
+            {
+                name: 'panel',
+            },
+            {
+                name: 'dashboard',
+            },
+            {
+                name: 'dash',
+            },
+            {
+                name: 'host',
+            },
+            {
+                name: 'localhost',
+            },
+            {
+                name: 'root',
+            },
+        ];
+        reservedDomains.map(async (reserveDomain) => {
+            try {
+                await reservedDomainController.adminAddNewReservedDomain(reserveDomain);
+            } catch (error) {
+                logger(
+                    'mongoose',
+                    `Seed reserved domain ${reserveDomain.name} already in collection.`,
+                );
+            }
+        });
+        logger('mongoose', 'seeing reserved domain collection done.');
     } catch (error) {}
 };
