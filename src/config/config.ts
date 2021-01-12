@@ -1,9 +1,9 @@
 export const CONFIG = {
     ENV: process.env.ENV,
-    PORT: 5000,
-    DATABASE_SERVER_URL: 'mongodb://127.0.0.1:27017/',
-    BASE_DB_NAME: 'sellerspot_core',
+    PORT: process.env.PORT,
+    DATABASE_SERVER_URL: process.env.DATABASE_SERVER_URL,
+    BASE_DB_NAME: process.env.BASE_DB_NAME,
     GET_DATABASE_CONNECTION_URL: (): string => CONFIG.DATABASE_SERVER_URL + CONFIG.BASE_DB_NAME,
-    JWT_SECRET: 'sellerspot_ecosystem',
-    CLIENT_BASE_DOMAIN_FOR_APPS: 'sellerspot.in',
+    JWT_SECRET: process.env.JWT_SECRET,
+    CLIENT_BASE_DOMAIN_FOR_APPS: process.env.CLIENT_BASE_DOMAIN_FOR_APPS,
 };

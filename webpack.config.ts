@@ -37,11 +37,6 @@ const webpackConfiguration = (env: {
             ],
         },
         plugins: [
-            new webpack.DefinePlugin({
-                'process.env.ENV': JSON.stringify(isProduction ? 'production' : 'development'),
-                'process.env.APP_NAME': JSON.stringify(packageJson.name),
-                'process.env.APP_VERSION': JSON.stringify(packageJson.version),
-            }),
             new CleanWebpackPlugin(),
             new ForkTsCheckerWebpackPlugin({
                 eslint: {

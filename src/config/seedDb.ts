@@ -37,6 +37,9 @@ export const seedReservedDomainCollection = async (): Promise<void> => {
         logger('mongoose', 'Seeding Reserved domain collection.');
         const reservedDomains: IReservedDomain[] = [
             {
+                name: 'www',
+            },
+            {
                 name: 'admin',
             },
             {
