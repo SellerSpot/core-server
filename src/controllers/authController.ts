@@ -46,7 +46,7 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
                     tenantId: tenant._id,
                     updatedAt: '',
                 } as ISubDomainResponse,
-                token: jwt.sign(payload, CONFIG.JWT_SECRET, {
+                token: jwt.sign(payload, CONFIG.APP_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),
             };
@@ -112,7 +112,7 @@ export const SignInTenant = async (
                     baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
                 } as ISubDomainResponse,
                 apps: tenant.apps,
-                token: jwt.sign(payload, CONFIG.JWT_SECRET, {
+                token: jwt.sign(payload, CONFIG.APP_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),
             };
@@ -141,7 +141,7 @@ export const verifyToken = async (socket: Socket): Promise<IResponse> => {
             throw 'tokenNotFound';
         }
         const response: IResponse = await new Promise((resolve, reject) =>
-            jwt.verify(token, CONFIG.JWT_SECRET, (err, decoded: ITokenPayload) => {
+            jwt.verify(token, CONFIG.APP_SECRET, (err, decoded: ITokenPayload) => {
                 if (err) {
                     reject('tokenExpired');
                 }
