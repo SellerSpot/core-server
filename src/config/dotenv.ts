@@ -1,18 +1,23 @@
 import dotenv from 'dotenv';
-import { logger } from 'utilities/logger';
+import path from 'path';
 
-export const configureEnvironment = (): void => {
+export const getEnvironmentVariables = (isProduction = false): { [key: string]: string } => {
+    const environmentVariables: { [key: string]: string } = {};
     try {
-        const envConfig = dotenv.config();
+        const envConfig = isProduction
+            ? dotenv.config()
+            : dotenv.config({
+                  path: path.resolve('./.env.development'),
+              });
         if (envConfig.error) throw new Error(`Env file config error ${envConfig.error.message}`);
         if (envConfig.parsed) {
-            logger('common', 'Successfully imported environment variables');
             // overriedes the machince's envirionment variables if any specified in .env file
             for (const k in envConfig.parsed) {
-                process.env[k] = envConfig.parsed[k];
+                environmentVariables[`process.env.${k}`] = JSON.stringify(envConfig.parsed[k]);
             }
         }
     } catch (error) {
-        logger('error', error.message ?? error);
+        console.error(error);
     }
+    return environmentVariables;
 };

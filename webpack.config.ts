@@ -5,13 +5,14 @@ import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import WebpackShellPluginNext from 'webpack-shell-plugin-next';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import nodeExternals from 'webpack-node-externals';
-import packageJson from './package.json';
+import { getEnvironmentVariables } from './src/config/dotenv';
 
 const webpackConfiguration = (env: {
     production?: boolean;
     development?: boolean;
 }): Configuration => {
     const isProduction = env.production ? true : false;
+    const envVariables = getEnvironmentVariables(isProduction);
     return {
         entry: './src',
         externalsPresets: { node: true },
@@ -37,6 +38,7 @@ const webpackConfiguration = (env: {
             ],
         },
         plugins: [
+            new webpack.DefinePlugin(envVariables), // setting environment variables
             new CleanWebpackPlugin(),
             new ForkTsCheckerWebpackPlugin({
                 eslint: {

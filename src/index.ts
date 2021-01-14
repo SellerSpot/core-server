@@ -1,7 +1,3 @@
-// .env initialization
-import { configureEnvironment } from 'config/dotenv';
-configureEnvironment();
-// imports
 import express from 'express';
 import http from 'http';
 import { Server as SocketServer } from 'socket.io';
