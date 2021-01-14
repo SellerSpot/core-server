@@ -9,10 +9,13 @@ COPY . .
 
 # ---- Dependencies ----
 FROM base AS dependencies
+# setting node environment to production
+ENV NODE_ENV=production
 # install node packages
-RUN npm install --only=production
-# copy production node_modules aside
-RUN cp -R node_modules prod_node_modules
+RUN npm install
+
+# ---- Dependencies ----
+FROM base AS build
 # install ALL node_modules, including 'devDependencies'
 RUN npm install
 # install ALL node_modules, including 'devDependencies'
@@ -20,11 +23,11 @@ RUN npm run build
 
 # ---- Release ----
 FROM base AS release
-# copy production node_modules
-COPY --from=dependencies /app/prod_node_modules ./node_modules
-# copy app sources
-COPY --from=dependencies /app/dist ./dist
-# expose port and define CMD
+# copy node_modules from dependencies stage
+COPY --from=dependencies /app/node_modules ./node_modules
+# copy dist from build stage
+COPY --from=build /app/dist ./dist
+# expose port
 EXPOSE 8000
-# executable
+# define CMD
 CMD ["node", "dist"]

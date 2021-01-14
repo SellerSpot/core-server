@@ -7,7 +7,7 @@
     "start": "node dist",
     "dev": "webpack --env development",
     "dev:server": "nodemon dist --color always",
-    "build": "webpack --mode production --env production",
+    "build": "webpack --mode production --env NODE_ENV=production --env production",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix"
   },
