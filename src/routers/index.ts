@@ -3,6 +3,6 @@ import baseRouter from './baseRouter';
 
 const rootRouter: Router = Router();
 
-rootRouter.use('/basae', baseRouter);
+rootRouter.use('/', baseRouter);
 
 export default rootRouter;
