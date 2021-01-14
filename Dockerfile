@@ -24,9 +24,7 @@ FROM base AS release
 COPY --from=dependencies /app/prod_node_modules ./node_modules
 # copy app sources
 COPY --from=dependencies /app/dist ./dist
-# copy app sources
-COPY --from=dependencies /app/server ./server
 # expose port and define CMD
-EXPOSE 6000
+EXPOSE 8000
 # executable
-CMD ["node", "server"]
+CMD ["node", "dist"]

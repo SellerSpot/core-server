@@ -5,9 +5,11 @@ declare global {
         interface ProcessEnv {
             ENV: 'development' | 'production';
             PORT?: string;
-            PWD: string;
-            APP_NAME?: string;
-            APP_VERSION?: string;
+            DATABASE_SERVER_URL: string;
+            DATABASE_SERVER_QUERY: string;
+            BASE_DB_NAME: string;
+            JWT_SECRET: string;
+            CLIENT_BASE_DOMAIN_FOR_APPS: string;
         }
 
         interface Global {
