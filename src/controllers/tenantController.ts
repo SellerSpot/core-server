@@ -3,6 +3,8 @@ import { MONGOOSE_MODELS } from 'config/mongooseModels';
 import { ITenant } from 'models/Tenant';
 import { ITenantHandshakeModel } from 'models/TenantHandshake';
 import { IResponse } from 'typings/request.types';
+import { logger } from 'utilities/logger';
+import { deleteSubDomain } from './subDomainController';
 
 /**
  * onboards a tenant with name and email
@@ -54,6 +56,15 @@ export const deleteTenant = async ({ tenantId }: { tenantId: string }): Promise<
         const TenantModel = baseDb.model(MONGOOSE_MODELS.TENANT);
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Tenant Not Found';
+
+        // deletes subdomain of the tenant if available
+        try {
+            await deleteSubDomain({ tenantId });
+        } catch (error) {
+            logger('common', `Tenant ${tenantId} has no subdomain - ${error}`);
+        }
+
+        // deletes tenant
         await tenant.delete();
 
         global.currentDb.useDb(null); // fail safe - not to delete base db
