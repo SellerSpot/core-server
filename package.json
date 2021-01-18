@@ -1,7 +1,7 @@
 {
   "name": "core-server",
   "version": "1.0.0",
-  "description": "core server is the heart of the sellerspot eco-system, it will hold perform opearation such as creating and managing tenants, hold the billing status of the tenant, install and customize application and more.",
+  "description": "core server is the heart of the sellerspot eco-system, It performs opearation such as creating and managing tenants, hold the billing status of the tenant, install and customize application and more.",
   "main": "index.js",
   "scripts": {
     "start": "node dist",
