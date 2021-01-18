@@ -18,7 +18,7 @@ RUN npm install
 FROM base AS build
 # install ALL node_modules, including 'devDependencies'
 RUN npm install
-# install ALL node_modules, including 'devDependencies'
+# build application
 RUN npm run build
 
 # ---- Release ----
@@ -30,4 +30,4 @@ COPY --from=build /app/dist ./dist
 # expose port
 EXPOSE 8000
 # define CMD
-CMD ["node", "dist"]
+CMD ["npm", "start"]
