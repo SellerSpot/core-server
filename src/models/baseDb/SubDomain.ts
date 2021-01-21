@@ -1,10 +1,10 @@
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
 
 const SubDomainSchema = new Schema(
     {
         domainName: String,
-        tenantId: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT },
+        tenantId: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
     },
     { timestamps: true },
 );
@@ -19,4 +19,7 @@ export interface ISubDomain {
 
 export type ISubDomainModel = Model<ISubDomain & Document>;
 
-export const SubDomainModel: ISubDomainModel = model(MONGOOSE_MODELS.SUB_DOMAIN, SubDomainSchema);
+export const SubDomainModel: ISubDomainModel = model(
+    MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN,
+    SubDomainSchema,
+);

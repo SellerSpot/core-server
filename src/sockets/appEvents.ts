@@ -1,6 +1,6 @@
 import { SOCKET_EVENTS } from 'config/socketEvents';
 import { appController, authController } from 'controllers';
-import { IApp } from 'models/App';
+import { baseDbModels } from 'models';
 import { Socket, Server } from 'socket.io';
 import { IResponse, ITokenPayload } from 'typings/request.types';
 import { logger } from 'utilities/logger';
@@ -219,26 +219,32 @@ const appEvents = (io: Server, socket: Socket): void => {
     /* admin events */
     // create app
     // admin validation is not yet comleted yet to integrate validation mechanism for admin tenant separation
-    socket.on(SOCKET_EVENTS.APP.ADMIN_CREATE_APP, async (data: IApp, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.ADMIN_CREATE_APP}, ${JSON.stringify(data)}`);
-        let response: IResponse;
-        try {
-            const token = await authController.verifyToken(socket);
-            if (!token.status) throw token;
-            response = await appController.adminCreateNewApp(data);
-        } catch (error) {
-            if (error.status !== undefined) {
-                response = error;
-            } else {
-                response = {
-                    status: false,
-                    statusCode: 500,
-                    data: 'Internal Server Error!',
-                };
+    socket.on(
+        SOCKET_EVENTS.APP.ADMIN_CREATE_APP,
+        async (data: baseDbModels.AppModel.IApp, callback) => {
+            logger(
+                'socketio',
+                `Event: ${SOCKET_EVENTS.APP.ADMIN_CREATE_APP}, ${JSON.stringify(data)}`,
+            );
+            let response: IResponse;
+            try {
+                const token = await authController.verifyToken(socket);
+                if (!token.status) throw token;
+                response = await appController.adminCreateNewApp(data);
+            } catch (error) {
+                if (error.status !== undefined) {
+                    response = error;
+                } else {
+                    response = {
+                        status: false,
+                        statusCode: 500,
+                        data: 'Internal Server Error!',
+                    };
+                }
             }
-        }
-        callback(response);
-    });
+            callback(response);
+        },
+    );
 
     // delete app
     socket.on(SOCKET_EVENTS.APP.ADMIN_DELETE_APP, async (data: { appId: string }, callback) => {

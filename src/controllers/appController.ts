@@ -1,22 +1,16 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { AppModel, TenantModel } from 'models';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
+import { baseDbModels } from 'models';
 import { IResponse } from 'typings/request.types';
-import { IApp } from 'models/App';
 import lodash from 'lodash';
 import mongoose, { Document } from 'mongoose';
 
 /* tenant interaction controllers */
-
-// get all available apps
-/**
- * maybe pagination in future
- */
 export const getAllApps = async (): Promise<IResponse> => {
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         const apps = await AppModel.find({});
 
@@ -44,7 +38,7 @@ export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promis
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         let app: Document;
         if (isSlug) {
@@ -91,21 +85,23 @@ export const getTenantInstalledAppByIdOrSlug = async (
 
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
 
-        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         const tenant = await TenantModel.findById(tenantId).populate(
             'apps',
             null,
-            MONGOOSE_MODELS.APP,
+            MONGOOSE_MODELS.BASE_DB.APP,
         );
 
         if (!tenant) throw 'requested tenant not found!';
 
         if (!tenant.apps) throw 'No apps installed';
 
-        const tenantInstalledApps = tenant.apps as IApp[];
+        const tenantInstalledApps = tenant.apps as baseDbModels.AppModel.IApp[];
 
         const findIndexQuery = !isSlug
             ? {
@@ -145,11 +141,13 @@ export const getTenantInstalledApps = async (data: { tenantId: string }): Promis
     try {
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(data.tenantId).populate(
             'apps',
             null,
-            MONGOOSE_MODELS.APP,
+            MONGOOSE_MODELS.BASE_DB.APP,
         );
         if (!tenant) throw 'Not found the requested Tenant!';
 
@@ -180,12 +178,14 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
 
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
         const app = await AppModel.findById(appId);
         if (!app)
             throw 'App you are looking for is currently not available, contact support for more details';
 
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Not found the requested Tenant!';
 
@@ -220,12 +220,14 @@ export const unInstallApp = async (data: {
         if (!(appId && tenantId)) throw 'Invalid Data';
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP); // fallback no check the app exisiting in app model
+        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP); // fallback no check the app exisiting in app model
         // const app = await AppModel.findById(appId);
         // if (!app)
         //     throw 'App you are looking for is currently not available, contact support for more details';
 
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Not found the requested Tenant!';
         const appIndex = tenant.apps.indexOf(appId);
@@ -252,12 +254,12 @@ export const unInstallApp = async (data: {
 };
 
 /* admin interaction controllers */
-export const adminCreateNewApp = async (data: IApp): Promise<IResponse> => {
+export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promise<IResponse> => {
     try {
         if (!(data.name && data.iconUrl)) throw 'Invalid Data';
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         if ((await AppModel.find({ name: data.name })).length !== 0)
             throw 'App with the Same name already available!';
@@ -294,7 +296,7 @@ export const adminDeleteApp = async (appId: string): Promise<IResponse> => {
         if (!appId) throw 'Invalid Data';
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         await AppModel.findByIdAndDelete(appId);
 

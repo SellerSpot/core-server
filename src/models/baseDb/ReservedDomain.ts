@@ -1,4 +1,4 @@
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
 
 const ReservedDomainSchema = new Schema(
@@ -18,6 +18,6 @@ export interface IReservedDomain {
 export type IReservedDomainModel = Model<IReservedDomain & Document>;
 
 export const ReservedDomainModel: IReservedDomainModel = model(
-    MONGOOSE_MODELS.RESERVED_DOMAIN,
+    MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
     ReservedDomainSchema,
 );

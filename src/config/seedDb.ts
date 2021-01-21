@@ -1,6 +1,6 @@
 import { appController, reservedDomainController } from 'controllers';
-import { IApp } from 'models/App';
-import { IReservedDomain } from 'models/ReservedDomain';
+import { IApp } from 'models/baseDb/App';
+import { IReservedDomain } from 'models/baseDb/ReservedDomain';
 import { logger } from 'utilities/logger';
 
 export const seedAppCollection = async (): Promise<void> => {

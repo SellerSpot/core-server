@@ -1,5 +1,4 @@
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { string } from 'joi';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
 import { Schema, model, Model, Document, Types } from 'mongoose';
 
 const AppSchema = new Schema(
@@ -34,4 +33,4 @@ export interface IApp {
 
 export type IAppModel = Model<IApp & Document>;
 
-export const AppModel: IAppModel = model(MONGOOSE_MODELS.APP, AppSchema);
+export const AppModel: IAppModel = model(MONGOOSE_MODELS.BASE_DB.APP, AppSchema);

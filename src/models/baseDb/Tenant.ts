@@ -1,4 +1,4 @@
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
 import { SubDomainModel } from '.';
 
@@ -6,8 +6,8 @@ const TenantSchema = new Schema({
     name: String,
     email: String,
     password: String,
-    subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.TENANT },
-    apps: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.APP }],
+    subDomain: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
+    apps: [{ type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.APP }], // this will just hold the basic ref of apps, all detailed thing will inside the tenantDb
 });
 
 export interface ITenant {
@@ -20,4 +20,4 @@ export interface ITenant {
 
 export type ITenantModel = Model<ITenant & Document>;
 
-export const TenantModel: ITenantModel = model(MONGOOSE_MODELS.TENANT, TenantSchema);
+export const TenantModel: ITenantModel = model(MONGOOSE_MODELS.BASE_DB.TENANT, TenantSchema);

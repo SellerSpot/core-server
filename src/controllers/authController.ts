@@ -1,13 +1,13 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { SubDomainModel, TenantModel } from 'models';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
+import { baseDbModels } from 'models';
 import { IResponse, ISubDomainResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
 import { tenantController } from 'controllers';
 
-export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse> => {
+export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Promise<IResponse> => {
     const response: IResponse = {
         status: false,
         statusCode: 400,
@@ -16,7 +16,9 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
     try {
         const { email, name, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         if (!(await TenantModel.findOne({ email }))) {
             const tenant = await TenantModel.create({
                 email,
@@ -69,7 +71,7 @@ export const SignUpTenant = async (data: TenantModel.ITenant): Promise<IResponse
 };
 
 export const SignInTenant = async (
-    data: Pick<TenantModel.ITenant, 'email' | 'password'>,
+    data: Pick<baseDbModels.TenantModel.ITenant, 'email' | 'password'>,
 ): Promise<IResponse> => {
     const response: IResponse = {
         status: false,
@@ -79,10 +81,12 @@ export const SignInTenant = async (
     try {
         const { email, password } = data;
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
-        const TenantModel: TenantModel.ITenantModel = db.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findOne({ email })
-            .populate('subDomain', null, MONGOOSE_MODELS.SUB_DOMAIN)
-            .populate('apps', null, MONGOOSE_MODELS.APP);
+            .populate('subDomain', null, MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN)
+            .populate('apps', null, MONGOOSE_MODELS.BASE_DB.APP);
         if (!tenant) throw `We couldn't find the account!, please check Your Email Id!`;
         if (bcrypt.compareSync(password, tenant.password)) {
             response.status = true;
@@ -92,7 +96,7 @@ export const SignInTenant = async (
                 name: tenant.name,
                 email: tenant.email,
             };
-            const subDomainDetails = <SubDomainModel.ISubDomain>tenant.subDomain ?? {
+            const subDomainDetails = <baseDbModels.SubDomainModel.ISubDomain>tenant.subDomain ?? {
                 domainName: '',
                 tenantId: tenant._id,
                 _id: '',
@@ -102,7 +106,7 @@ export const SignInTenant = async (
             response.data = {
                 ...payload,
                 subDomain: {
-                    ...(<SubDomainModel.ISubDomain>{
+                    ...(<baseDbModels.SubDomainModel.ISubDomain>{
                         _id: subDomainDetails._id,
                         domainName: subDomainDetails.domainName,
                         tenantId: subDomainDetails.tenantId,

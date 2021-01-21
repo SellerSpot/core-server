@@ -1,18 +1,18 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { ReservedDomainModel } from 'models';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
+import { baseDbModels } from 'models';
 import { IResponse } from 'typings/request.types';
 
 /* admin interaction controllers */
 export const adminAddNewReservedDomain = async (
-    data: ReservedDomainModel.IReservedDomain,
+    data: baseDbModels.ReservedDomainModel.IReservedDomain,
 ): Promise<IResponse> => {
     try {
         if (!(data.name && data.name)) throw 'Invalid Data';
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const ReservedDomainModel: ReservedDomainModel.IReservedDomainModel = db.model(
-            MONGOOSE_MODELS.RESERVED_DOMAIN,
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
 
         if ((await ReservedDomainModel.find({ name: data.name })).length !== 0)
@@ -47,8 +47,8 @@ export const deleteReservedDomain = async (domainId: string): Promise<IResponse>
         if (!domainId) throw 'Invalid Data';
         const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
 
-        const ReservedDomainModel: ReservedDomainModel.IReservedDomainModel = db.model(
-            MONGOOSE_MODELS.RESERVED_DOMAIN,
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
+            MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
 
         await ReservedDomainModel.findByIdAndDelete(domainId);

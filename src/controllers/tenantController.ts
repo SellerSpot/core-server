@@ -1,7 +1,6 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'config/mongooseModels';
-import { ITenant } from 'models/Tenant';
-import { ITenantHandshakeModel } from 'models/TenantHandshake';
+import { MONGOOSE_MODELS } from 'models/mongooseModels';
+import { baseDbModels, tenantDbModels } from 'models';
 import { IResponse } from 'typings/request.types';
 import { logger } from 'utilities/logger';
 import { deleteSubDomain } from './subDomainController';
@@ -10,13 +9,13 @@ import { deleteSubDomain } from './subDomainController';
  * onboards a tenant with name and email
  */
 export const setupTenant = async (
-    tenantData: Pick<ITenant, 'name' | 'email'> & { id: string },
+    tenantData: Pick<baseDbModels.TenantModel.ITenant, 'name' | 'email'> & { id: string },
 ): Promise<IResponse> => {
     try {
         if (tenantData.id) {
             const db = global.currentDb.useDb(tenantData.id.toString()); // id comes and mongoose id to converted to  string
-            const TentatHandshakeModel: ITenantHandshakeModel = db.model(
-                MONGOOSE_MODELS.TENANT_HANDSHAKE,
+            const TentatHandshakeModel: tenantDbModels.TentatHandshakeModel.ITenantHandshakeModel = db.model(
+                MONGOOSE_MODELS.TENANT_DB.TENANT_HANDSHAKE,
             );
             const tenantHandshake = await TentatHandshakeModel.create({
                 email: tenantData.email,
@@ -53,7 +52,7 @@ export const deleteTenant = async ({ tenantId }: { tenantId: string }): Promise<
     try {
         if (!tenantId) throw 'Something went wrong';
         const baseDb = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
-        const TenantModel = baseDb.model(MONGOOSE_MODELS.TENANT);
+        const TenantModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.TENANT);
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Tenant Not Found';
 
