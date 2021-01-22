@@ -4,7 +4,6 @@ import { IResponse } from 'typings/request.types';
 import lodash from 'lodash';
 import mongoose, { Document } from 'mongoose';
 import { logger } from 'utilities/logger';
-
 /* tenant interaction controllers */
 // get all apps
 export const getAllApps = async (): Promise<IResponse> => {
@@ -301,13 +300,7 @@ export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promi
         });
 
         // checking cross db population
-        const appDetails = await DetailModel.findById(appDetail.id).populate(
-            'app',
-            null,
-            MONGOOSE_MODELS.BASE_DB.APP,
-        );
-
-        logger.mongoose(appDetail.id, appDetails);
+        const appDetails = await DetailModel.findById(appDetail.id).populate('app', null, AppModel); // keep an eye on third param, here AppModel instance is passed, instead name.
 
         return Promise.resolve({
             status: true,
@@ -332,11 +325,24 @@ export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promi
 export const adminDeleteApp = async (appId: string): Promise<IResponse> => {
     try {
         if (!appId) throw 'Invalid Data';
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
 
-        await AppModel.findByIdAndDelete(appId);
+        const app = await AppModel.findById(appId);
+
+        const appDatabaseName = app.dbName;
+
+        // deletes tenant
+        await app.delete();
+
+        logger.mongoose('Deleted database', appDatabaseName);
+
+        global.currentDb.useDb(null); // fail safe - not to delete base db
+
+        // deletes tenant db
+        const appDb = global.currentDb.useDb(appDatabaseName.toString()); // id comes and mongoose id to converted to  string
+        await appDb.dropDatabase();
 
         return Promise.resolve({
             status: true,
