@@ -1,16 +1,17 @@
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { appDbModels, baseDbModels, DB_NAMES } from 'models';
+import { appDbModels, baseDbModels, DB_NAMES, tenantDbModels } from 'models';
 import { IResponse } from 'typings/request.types';
 import lodash from 'lodash';
 import mongoose, { Document } from 'mongoose';
 import { logger } from 'utilities/logger';
 /* tenant interaction controllers */
+
 // get all apps
 export const getAllApps = async (): Promise<IResponse> => {
     try {
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         const apps = await AppModel.find({});
 
@@ -33,12 +34,12 @@ export const getAllApps = async (): Promise<IResponse> => {
     }
 };
 
-// get tenant installed app app by id / also by slug name
+// get an app by id / also by slug name
 export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promise<IResponse> => {
     try {
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         let app: Document;
         if (isSlug) {
@@ -59,7 +60,7 @@ export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promis
             statusCode: 400,
             data: [
                 {
-                    name: 'allAppsGetFailure',
+                    name: 'appGetFailure',
                     message: error.message ?? error,
                 },
             ],
@@ -67,7 +68,100 @@ export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promis
     }
 };
 
-// get tenant installed app by id
+// tenant install app = till here
+export const installApp = async (data: { appId: string; tenantId: string }): Promise<IResponse> => {
+    try {
+        const { appId, tenantId } = data;
+        if (!(appId && tenantId)) throw 'Invalid Data';
+
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
+
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
+        const app = await AppModel.findById(appId);
+        if (!app)
+            throw 'App you are looking for is currently not available, contact support for more details';
+
+        // create on base db tenant model
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
+        const tenant = await TenantModel.findById(tenantId);
+        if (!tenant) throw 'Not found the requested Tenant!';
+        if ((<string[]>tenant.apps).includes(app.id))
+            throw 'App already installed or currently installing!';
+        (<string[]>tenant.apps).push(app.id); // installing app
+        await tenant.save();
+
+        // create on tenant db installed app model
+        const tenantDb = global.currentDb.useDb(tenantId);
+        const InstalledAppsModel: tenantDbModels.InstalledAppModel.IInstalledAppModel = tenantDb.model(
+            MONGOOSE_MODELS.TENANT_DB.INSTAllED_APP,
+        );
+        // no need to check before create here , hence check in basedb tenantModel, earlier, if needed we'll do validation here later.
+        await InstalledAppsModel.create({
+            app: app.id,
+        });
+
+        return await getTenantInstalledApps({ tenantId });
+    } catch (error) {
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'appInstallationFailure',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
+    }
+};
+
+// tenant uninstall app
+export const unInstallApp = async (data: {
+    appId: string;
+    tenantId: string;
+}): Promise<IResponse> => {
+    try {
+        const { appId, tenantId } = data;
+        if (!(appId && tenantId)) throw 'Invalid Data';
+
+        // delete on basedb tenant model app array
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
+        const tenant = await TenantModel.findById(tenantId);
+        if (!tenant) throw 'Not found the requested Tenant!';
+        const appIndex = (<string[]>tenant.apps).indexOf(appId);
+        if (appIndex !== -1) {
+            tenant.apps.splice(appIndex, 1); // uninstalling app
+        } // may need to throw error on else
+        await tenant.save();
+
+        // delete on tenant db installedApps colleection
+        const tenantDb = global.currentDb.useDb(tenantId);
+        const InstalledAppsModel: tenantDbModels.InstalledAppModel.IInstalledAppModel = tenantDb.model(
+            MONGOOSE_MODELS.TENANT_DB.INSTAllED_APP,
+        );
+        await InstalledAppsModel.findOneAndDelete({ app: appId });
+
+        return await getTenantInstalledApps({ tenantId });
+    } catch (error) {
+        return Promise.reject({
+            status: false,
+            statusCode: 400,
+            data: [
+                {
+                    name: 'appUninstallFailure',
+                    message: error.message ?? error,
+                },
+            ],
+        } as IResponse);
+    }
+};
+
+// get a tenant installed app by id
 export const getTenantInstalledAppByIdOrSlug = async (
     {
         appIdOrSlug,
@@ -82,13 +176,11 @@ export const getTenantInstalledAppByIdOrSlug = async (
         if (!appIdOrSlug || !tenantId)
             throw 'Ivalid request body! appIdOrSlug and tenantid needed!';
 
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );
-
-        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
         const tenant = await TenantModel.findById(tenantId).populate(
             'apps',
@@ -116,10 +208,23 @@ export const getTenantInstalledAppByIdOrSlug = async (
 
         const requestedApp = tenantInstalledApps[requestedAppIndex];
 
+        // taking app model reference from baseDb for population purpose
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
+
+        // getting installed apps from tenant db => we could send additional info about installed app (like expiry, feature allowed, bla bla..) from tenant db installed Apps model, hence we don't directly send requestedApp to client.
+        const tenantDb = global.currentDb.useDb(tenantId);
+        const InstalledAppModel: tenantDbModels.InstalledAppModel.IInstalledAppModel = tenantDb.model(
+            MONGOOSE_MODELS.TENANT_DB.INSTAllED_APP,
+        );
+        const installedApp = await InstalledAppModel.findOne({
+            app: requestedApp._id.toString(),
+        }).populate('app', 'app', AppModel); // sending only app property from installedApp model for now, will pivot it later based on requirement
+        if (!installedApp) throw 'Requested App not installed!';
+
         return Promise.resolve({
             status: true,
             statusCode: 200,
-            data: requestedApp,
+            data: installedApp,
         });
     } catch (error) {
         return Promise.reject({
@@ -135,7 +240,7 @@ export const getTenantInstalledAppByIdOrSlug = async (
     }
 };
 
-// get tenant installed apps
+// get all tenant installed apps
 export const getTenantInstalledApps = async (data: { tenantId: string }): Promise<IResponse> => {
     try {
         const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
@@ -169,91 +274,7 @@ export const getTenantInstalledApps = async (data: { tenantId: string }): Promis
     }
 };
 
-// tenant install app
-export const installApp = async (data: { appId: string; tenantId: string }): Promise<IResponse> => {
-    try {
-        const { appId, tenantId } = data;
-        if (!(appId && tenantId)) throw 'Invalid Data';
-
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
-
-        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
-        const app = await AppModel.findById(appId);
-        if (!app)
-            throw 'App you are looking for is currently not available, contact support for more details';
-
-        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
-            MONGOOSE_MODELS.BASE_DB.TENANT,
-        );
-        const tenant = await TenantModel.findById(tenantId);
-        if (!tenant) throw 'Not found the requested Tenant!';
-
-        if ((<string[]>tenant.apps).includes(app.id)) throw 'App already installed!';
-
-        (<string[]>tenant.apps).push(app.id); // installing app
-
-        await tenant.save();
-
-        // in future we need to move it to many to one relation (every app will contain collection, each entry will be installed as instace entry, which prevents the users's document to exceeds 36mb )
-        return await getTenantInstalledApps({ tenantId });
-    } catch (error) {
-        return Promise.reject({
-            status: false,
-            statusCode: 400,
-            data: [
-                {
-                    name: 'appInstallationFailure',
-                    message: error.message ?? error,
-                },
-            ],
-        } as IResponse);
-    }
-};
-
-// tenant uninstall app
-export const unInstallApp = async (data: {
-    appId: string;
-    tenantId: string;
-}): Promise<IResponse> => {
-    try {
-        const { appId, tenantId } = data;
-        if (!(appId && tenantId)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
-
-        // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP); // fallback no check the app exisiting in app model
-        // const app = await AppModel.findById(appId);
-        // if (!app)
-        //     throw 'App you are looking for is currently not available, contact support for more details';
-
-        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
-            MONGOOSE_MODELS.BASE_DB.TENANT,
-        );
-        const tenant = await TenantModel.findById(tenantId);
-        if (!tenant) throw 'Not found the requested Tenant!';
-        const appIndex = (<string[]>tenant.apps).indexOf(appId);
-        if (appIndex !== -1) {
-            tenant.apps.splice(appIndex, 1); // uninstalling app
-        }
-        await tenant.save();
-
-        // in future we need to move it to many to one relation (every app will contain collection, each entry will be installed as instace entry, which prevents the users's document to exceeds 36mb )
-
-        return await getTenantInstalledApps({ tenantId });
-    } catch (error) {
-        return Promise.reject({
-            status: false,
-            statusCode: 400,
-            data: [
-                {
-                    name: 'appUninstallFailure',
-                    message: error.message ?? error,
-                },
-            ],
-        } as IResponse);
-    }
-};
-
-/* admin interaction controllers */
+// admin interaction controllers
 export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promise<IResponse> => {
     /**
      * Data flow
