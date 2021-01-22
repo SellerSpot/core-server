@@ -1,14 +1,15 @@
-import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels } from 'models';
+import { appDbModels, baseDbModels, DB_NAMES } from 'models';
 import { IResponse } from 'typings/request.types';
 import lodash from 'lodash';
 import mongoose, { Document } from 'mongoose';
+import { logger } from 'utilities/logger';
 
 /* tenant interaction controllers */
+// get all apps
 export const getAllApps = async (): Promise<IResponse> => {
     try {
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
@@ -33,10 +34,10 @@ export const getAllApps = async (): Promise<IResponse> => {
     }
 };
 
-// get app by id / also by slug name
+// get tenant installed app app by id / also by slug name
 export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promise<IResponse> => {
     try {
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 
@@ -68,7 +69,6 @@ export const getAppByIdOrSlug = async (idOrSlug: string, isSlug = false): Promis
 };
 
 // get tenant installed app by id
-// get app by id
 export const getTenantInstalledAppByIdOrSlug = async (
     {
         appIdOrSlug,
@@ -83,7 +83,7 @@ export const getTenantInstalledAppByIdOrSlug = async (
         if (!appIdOrSlug || !tenantId)
             throw 'Ivalid request body! appIdOrSlug and tenantid needed!';
 
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
@@ -139,7 +139,7 @@ export const getTenantInstalledAppByIdOrSlug = async (
 // get tenant installed apps
 export const getTenantInstalledApps = async (data: { tenantId: string }): Promise<IResponse> => {
     try {
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
@@ -170,13 +170,13 @@ export const getTenantInstalledApps = async (data: { tenantId: string }): Promis
     }
 };
 
-// install app
+// tenant install app
 export const installApp = async (data: { appId: string; tenantId: string }): Promise<IResponse> => {
     try {
         const { appId, tenantId } = data;
         if (!(appId && tenantId)) throw 'Invalid Data';
 
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
         const app = await AppModel.findById(appId);
@@ -189,9 +189,9 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Not found the requested Tenant!';
 
-        if (tenant.apps.includes(app.id)) throw 'App already installed!';
+        if ((<string[]>tenant.apps).includes(app.id)) throw 'App already installed!';
 
-        tenant.apps.push(app.id); // installing app
+        (<string[]>tenant.apps).push(app.id); // installing app
 
         await tenant.save();
 
@@ -211,6 +211,7 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
     }
 };
 
+// tenant uninstall app
 export const unInstallApp = async (data: {
     appId: string;
     tenantId: string;
@@ -218,7 +219,7 @@ export const unInstallApp = async (data: {
     try {
         const { appId, tenantId } = data;
         if (!(appId && tenantId)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         // const AppModel: AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP); // fallback no check the app exisiting in app model
         // const app = await AppModel.findById(appId);
@@ -230,7 +231,7 @@ export const unInstallApp = async (data: {
         );
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Not found the requested Tenant!';
-        const appIndex = tenant.apps.indexOf(appId);
+        const appIndex = (<string[]>tenant.apps).indexOf(appId);
         if (appIndex !== -1) {
             tenant.apps.splice(appIndex, 1); // uninstalling app
         }
@@ -255,26 +256,63 @@ export const unInstallApp = async (data: {
 
 /* admin interaction controllers */
 export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promise<IResponse> => {
+    /**
+     * Data flow
+     * 1. validate new app
+     * 2. create slugName and databaseName !important
+     * 3. create app on basedb => appCollection
+     * 4. create db for app and push the detail handshake collection into it
+     */
     try {
+        // validation block
         if (!(data.name && data.iconUrl)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const appName = data.name.trim();
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
+        // choosing app model from base db
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
 
-        if ((await AppModel.find({ name: data.name })).length !== 0)
+        if ((await AppModel.find({ name: appName })).length !== 0)
             throw 'App with the Same name already available!';
 
+        // data creation block
         // creating slug for url tracing (readability)
-        data.slug = data.name.toLowerCase().split(' ').join('-');
+        data.slug = appName.toLowerCase().split(' ').join('-');
+        const appDatabaseName = appName.toUpperCase().split(' ');
+        appDatabaseName.push(...['APP', 'DB']);
+        data.dbName = appDatabaseName.join('_'); // it will give database names like POINT_OF_SALE_APP_DB
 
+        // create app on basedb => appCollection
+        // db ref is alreay on base_db => no need to switch
         const app = await AppModel.create({
             ...data,
         });
 
+        //  create db for app and push the detail handshake collection into it
+        // switching db to new app databaseName
+        const appDb = global.currentDb.useDb(app.dbName); // the same db name should be in the dbName.ts under models.
+
+        // choosing detail model from current app's db
+        const DetailModel: appDbModels.DetailModel.IDetailModel = appDb.model(
+            MONGOOSE_MODELS.APP_DB.DETAIL,
+        );
+        const appDetail = await DetailModel.create({
+            app: app.id,
+        });
+
+        // checking cross db population
+        const appDetails = await DetailModel.findById(appDetail.id).populate(
+            'app',
+            null,
+            MONGOOSE_MODELS.BASE_DB.APP,
+        );
+
+        logger.mongoose(appDetail.id, appDetails);
+
         return Promise.resolve({
             status: true,
             statusCode: 200,
-            data: app,
+            data: appDetails,
         });
     } catch (error) {
         return Promise.reject({
@@ -294,7 +332,7 @@ export const adminCreateNewApp = async (data: baseDbModels.AppModel.IApp): Promi
 export const adminDeleteApp = async (appId: string): Promise<IResponse> => {
     try {
         if (!appId) throw 'Invalid Data';
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const AppModel: baseDbModels.AppModel.IAppModel = db.model(MONGOOSE_MODELS.BASE_DB.APP);
 

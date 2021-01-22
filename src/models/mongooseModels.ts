@@ -13,7 +13,7 @@ export const MONGOOSE_MODELS = {
         INSTAllED_APP: 'INSTAllED_APP',
         // billing model needs to added once confirmed
     },
-    POINT_OF_SALE_DB: {
+    APP_DB: {
         DETAIL: 'DETAIL',
         INSTALLED_TENANT: 'INSTALLED_TENANT',
         // features model needs to be added as per requirement

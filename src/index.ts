@@ -31,5 +31,5 @@ setSocketEventHandlers(io);
 
 // http listener
 httpServer.listen(CONFIG.PORT, () => {
-    logger('express', `Server started at the port ${CONFIG.PORT}`);
+    logger.express(`Server started at the port`, CONFIG.PORT);
 });

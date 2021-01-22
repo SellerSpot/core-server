@@ -5,7 +5,7 @@ import { logger } from 'utilities/logger';
 
 export const seedAppCollection = async (): Promise<void> => {
     try {
-        logger('mongoose', 'Seeding App collection with default apps.');
+        logger.mongoose('Seeding App collection with default apps.');
         const apps: IApp[] = [
             {
                 name: 'Point of Sale',
@@ -25,16 +25,16 @@ export const seedAppCollection = async (): Promise<void> => {
             try {
                 await appController.adminCreateNewApp(app);
             } catch (error) {
-                logger('mongoose', `Seed App ${app.name} already in collection.`);
+                logger.mongoose(`Seed App ${app.name} already in collection.`);
             }
         });
-        logger('mongoose', 'seeing app collection done.');
+        logger.mongoose('seeing app collection done.');
     } catch (error) {}
 };
 
 export const seedReservedDomainCollection = async (): Promise<void> => {
     try {
-        logger('mongoose', 'Seeding Reserved domain collection.');
+        logger.mongoose('Seeding Reserved domain collection.');
         const reservedDomains: IReservedDomain[] = [
             {
                 name: 'www',
@@ -104,12 +104,11 @@ export const seedReservedDomainCollection = async (): Promise<void> => {
             try {
                 await reservedDomainController.adminAddNewReservedDomain(reserveDomain);
             } catch (error) {
-                logger(
-                    'mongoose',
+                logger.mongoose(
                     `Seed reserved domain ${reserveDomain.name} already in collection.`,
                 );
             }
         });
-        logger('mongoose', 'seeding reserved domain collection done.');
+        logger.mongoose('seeding reserved domain collection done.');
     } catch (error) {}
 };

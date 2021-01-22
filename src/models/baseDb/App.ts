@@ -5,6 +5,7 @@ const AppSchema = new Schema(
     {
         name: String,
         slug: String,
+        dbName: String,
         shortDescription: String,
         longDescription: String,
         iconUrl: String,
@@ -19,14 +20,15 @@ const AppSchema = new Schema(
 );
 
 export interface IApp {
+    name: string;
+    shortDescription: string;
+    longDescription: string;
+    iconUrl: string;
+    bannerImages: string[];
+    domainName: string;
     _id?: string | Types.ObjectId;
-    name?: string;
     slug?: string;
-    shortDescription?: string;
-    longDescription?: string;
-    iconUrl?: string;
-    bannerImages?: string[];
-    domainName?: string;
+    dbName?: string;
     createdAt?: string;
     updatedAt?: string;
 }

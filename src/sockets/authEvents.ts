@@ -9,7 +9,7 @@ const authEvents = (io: Server, socket: Socket): void => {
      * signsup a tenant
      * */
     socket.on(SOCKET_EVENTS.AUTH.SIGN_UP, async (data, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.AUTH.SIGN_UP}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.AUTH.SIGN_UP}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             response = await authController.SignUpTenant(data);
@@ -30,7 +30,7 @@ const authEvents = (io: Server, socket: Socket): void => {
      *  signs in a tenant
      */
     socket.on(SOCKET_EVENTS.AUTH.SIGN_IN, async (data, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.AUTH.SIGN_IN}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.AUTH.SIGN_IN}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             response = await authController.SignInTenant(data);
@@ -52,7 +52,7 @@ const authEvents = (io: Server, socket: Socket): void => {
      * verifies token for a tenant and returns id and tenant related information that IJwtpayload interface has in it.
      */
     socket.on(SOCKET_EVENTS.AUTH.VERIFY_TOKEN, async (_data, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.AUTH.VERIFY_TOKEN} ${typeof callback}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.AUTH.VERIFY_TOKEN} ${typeof callback}`);
         let response: IResponse;
         try {
             response = await authController.verifyToken(socket);
@@ -74,7 +74,7 @@ const authEvents = (io: Server, socket: Socket): void => {
      * deletes tenant account
      */
     socket.on(SOCKET_EVENTS.AUTH.DELETE_TENANT_ACCOUNT, async (_data, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.AUTH.DELETE_TENANT_ACCOUNT} ${typeof callback}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.AUTH.DELETE_TENANT_ACCOUNT} ${typeof callback}`);
         let response: IResponse;
         try {
             const token = await authController.verifyToken(socket);

@@ -1,6 +1,6 @@
 import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels } from 'models';
+import { baseDbModels, DB_NAMES } from 'models';
 import { IResponse, ISubDomainResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -15,7 +15,7 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
     };
     try {
         const { email, name, password } = data;
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
         const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );
@@ -80,7 +80,7 @@ export const SignInTenant = async (
     };
     try {
         const { email, password } = data;
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
         const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );

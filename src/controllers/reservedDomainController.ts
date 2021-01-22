@@ -1,6 +1,5 @@
-import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels } from 'models';
+import { baseDbModels, DB_NAMES } from 'models';
 import { IResponse } from 'typings/request.types';
 
 /* admin interaction controllers */
@@ -9,7 +8,7 @@ export const adminAddNewReservedDomain = async (
 ): Promise<IResponse> => {
     try {
         if (!(data.name && data.name)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
@@ -45,7 +44,7 @@ export const adminAddNewReservedDomain = async (
 export const deleteReservedDomain = async (domainId: string): Promise<IResponse> => {
     try {
         if (!domainId) throw 'Invalid Data';
-        const db = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
         const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,

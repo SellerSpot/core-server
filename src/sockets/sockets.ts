@@ -16,5 +16,5 @@ export const setSocketEventHandlers = (io: Server): void => {
         subDomainEvents(io, socket);
         appEvents(io, socket);
     });
-    logger('socketio', 'All Socket Event Handlers Applied!');
+    logger.socketio('All Socket Event Handlers Applied!');
 };

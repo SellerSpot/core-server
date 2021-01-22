@@ -1,5 +1,6 @@
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
 import { Schema, model, Model, Document } from 'mongoose';
+import { baseDbModels } from '..';
 
 const DetailSchema = new Schema(
     {
@@ -10,7 +11,7 @@ const DetailSchema = new Schema(
 );
 
 export interface IDetail {
-    app: string;
+    app: string | baseDbModels.AppModel.IApp;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;
@@ -18,7 +19,4 @@ export interface IDetail {
 
 export type IDetailModel = Model<IDetail & Document>;
 
-export const DetailModel: IDetailModel = model(
-    MONGOOSE_MODELS.POINT_OF_SALE_DB.DETAIL,
-    DetailSchema,
-);
+export const DetailModel: IDetailModel = model(MONGOOSE_MODELS.APP_DB.DETAIL, DetailSchema);

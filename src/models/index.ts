@@ -1,3 +1,6 @@
+// mongoose connection reference handShake
+export const handshake = true;
+
 // database name exports
 export * from './dbNames';
 
@@ -7,6 +10,4 @@ export * from './mongooseModels';
 // database models exports
 export * as baseDbModels from './baseDb';
 export * as tenantDbModels from './tenantDb';
-
-// mongoose connection reference handShake
-export const handshake = true;
+export * as appDbModels from './appDb';

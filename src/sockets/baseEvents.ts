@@ -6,7 +6,7 @@ import { logger } from 'utilities/logger';
 
 const baseEvents = (io: Server, socket: Socket): void => {
     socket.on(SOCKET_EVENTS.BASE.HANDSHAKE, async (data, callback) => {
-        logger('socketio', `Handshake event called with data ${JSON.stringify(data)}`);
+        logger.socketio(`Handshake event called with data ${JSON.stringify(data)}`);
         let response: IResponse;
         if (typeof callback !== 'function') {
             return socket.disconnect(); // not an acknowledgement

@@ -9,8 +9,7 @@ const appEvents = (io: Server, socket: Socket): void => {
     /* tenant events */
     // get all apps
     socket.on(SOCKET_EVENTS.APP.GET_ALL_APPS, async (_data, callback) => {
-        logger(
-            'socketio',
+        logger.socketio(
             `Event: ${SOCKET_EVENTS.APP.GET_ALL_APPS}, ${JSON.stringify(typeof callback)}`,
         );
         let response: IResponse;
@@ -32,7 +31,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // get app by id
     socket.on(SOCKET_EVENTS.APP.GET_APP_BY_ID, async (data: { appId: string }, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.GET_APP_BY_ID}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.APP.GET_APP_BY_ID}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             response = await appController.getAppByIdOrSlug(data.appId);
@@ -52,7 +51,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // get app by slug
     socket.on(SOCKET_EVENTS.APP.GET_APP_BY_SLUG, async (data: { appId: string }, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.GET_APP_BY_SLUG}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.APP.GET_APP_BY_SLUG}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             response = await appController.getAppByIdOrSlug(data.appId, true);
@@ -74,8 +73,7 @@ const appEvents = (io: Server, socket: Socket): void => {
     socket.on(
         SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APP_BY_ID,
         async (data: { appId: string }, callback) => {
-            logger(
-                'socketio',
+            logger.socketio(
                 `Event: ${SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APP_BY_ID}, ${JSON.stringify(
                     data,
                 )}`,
@@ -107,8 +105,7 @@ const appEvents = (io: Server, socket: Socket): void => {
     socket.on(
         SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APP_BY_SLUG,
         async (data: { appId: string }, callback) => {
-            logger(
-                'socketio',
+            logger.socketio(
                 `Event: ${SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APP_BY_SLUG}, ${JSON.stringify(
                     data,
                 )}`,
@@ -141,8 +138,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // get tenant installed apps using tenant id
     socket.on(SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APPS, async (_data, callback) => {
-        logger(
-            'socketio',
+        logger.socketio(
             `Event: ${SOCKET_EVENTS.APP.GET_TENANT_INSTALLED_APPS}, ${typeof callback}`,
         );
         let response: IResponse;
@@ -168,7 +164,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // install app
     socket.on(SOCKET_EVENTS.APP.INSTALL, async (data: { appId: string }, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.INSTALL}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.APP.INSTALL}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             const token = await authController.verifyToken(socket);
@@ -193,7 +189,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // uninstall app
     socket.on(SOCKET_EVENTS.APP.UNINSTALL, async (data: { appId: string }, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.UNINSTALL}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.APP.UNINSTALL}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             const token = await authController.verifyToken(socket);
@@ -222,8 +218,7 @@ const appEvents = (io: Server, socket: Socket): void => {
     socket.on(
         SOCKET_EVENTS.APP.ADMIN_CREATE_APP,
         async (data: baseDbModels.AppModel.IApp, callback) => {
-            logger(
-                'socketio',
+            logger.socketio(
                 `Event: ${SOCKET_EVENTS.APP.ADMIN_CREATE_APP}, ${JSON.stringify(data)}`,
             );
             let response: IResponse;
@@ -248,7 +243,7 @@ const appEvents = (io: Server, socket: Socket): void => {
 
     // delete app
     socket.on(SOCKET_EVENTS.APP.ADMIN_DELETE_APP, async (data: { appId: string }, callback) => {
-        logger('socketio', `Event: ${SOCKET_EVENTS.APP.ADMIN_DELETE_APP}, ${JSON.stringify(data)}`);
+        logger.socketio(`Event: ${SOCKET_EVENTS.APP.ADMIN_DELETE_APP}, ${JSON.stringify(data)}`);
         let response: IResponse;
         try {
             const token = await authController.verifyToken(socket);

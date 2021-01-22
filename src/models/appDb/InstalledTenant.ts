@@ -19,6 +19,6 @@ export interface IInstalledTenant {
 export type IInstalledTenantModel = Model<IInstalledTenant & Document>;
 
 export const InstalledTenantModel: IInstalledTenantModel = model(
-    MONGOOSE_MODELS.POINT_OF_SALE_DB.INSTALLED_TENANT,
+    MONGOOSE_MODELS.APP_DB.INSTALLED_TENANT,
     InstalledTenantSchema,
 );

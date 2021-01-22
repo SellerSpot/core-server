@@ -7,8 +7,7 @@ import { logger } from 'utilities/logger';
 const subDomainEvents = (io: Server, socket: Socket): void => {
     // create subdomain
     socket.on(SOCKET_EVENTS.SUB_DOMAIN.CREATE_SUB_DOMAIN, async (data, callback) => {
-        logger(
-            'socketio',
+        logger.socketio(
             `Event: ${SOCKET_EVENTS.SUB_DOMAIN.CREATE_SUB_DOMAIN}, ${JSON.stringify(data)}`,
         );
         let response: IResponse;
@@ -35,8 +34,7 @@ const subDomainEvents = (io: Server, socket: Socket): void => {
 
     // update subdomain
     socket.on(SOCKET_EVENTS.SUB_DOMAIN.UPDATE_SUB_DOMAIN, async (data, callback) => {
-        logger(
-            'socketio',
+        logger.socketio(
             `Event: ${SOCKET_EVENTS.SUB_DOMAIN.UPDATE_SUB_DOMAIN}, ${JSON.stringify(data)}`,
         );
         let response: IResponse;
@@ -63,10 +61,7 @@ const subDomainEvents = (io: Server, socket: Socket): void => {
 
     // delete subdomain
     socket.on(SOCKET_EVENTS.SUB_DOMAIN.DELETE_SUB_DOMAIN, async (_data, callback) => {
-        logger(
-            'socketio',
-            `Event: ${SOCKET_EVENTS.SUB_DOMAIN.DELETE_SUB_DOMAIN}, ${typeof callback}`,
-        );
+        logger.socketio(`Event: ${SOCKET_EVENTS.SUB_DOMAIN.DELETE_SUB_DOMAIN}, ${typeof callback}`);
         let response: IResponse;
         try {
             const token = await authController.verifyToken(socket);
@@ -90,8 +85,7 @@ const subDomainEvents = (io: Server, socket: Socket): void => {
 
     // subdomain availability check
     socket.on(SOCKET_EVENTS.SUB_DOMAIN.SUB_DOMAIN_AVAILABILITY_CHECK, async (data, callback) => {
-        logger(
-            'socketio',
+        logger.socketio(
             `Event: ${SOCKET_EVENTS.SUB_DOMAIN.SUB_DOMAIN_AVAILABILITY_CHECK}, ${JSON.stringify(
                 data,
             )}`,

@@ -1,6 +1,5 @@
-import { CONFIG } from 'config/config';
 import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels, tenantDbModels } from 'models';
+import { baseDbModels, DB_NAMES, tenantDbModels } from 'models';
 import { IResponse } from 'typings/request.types';
 import { logger } from 'utilities/logger';
 import { deleteSubDomain } from './subDomainController';
@@ -51,7 +50,7 @@ export const setupTenant = async (
 export const deleteTenant = async ({ tenantId }: { tenantId: string }): Promise<IResponse> => {
     try {
         if (!tenantId) throw 'Something went wrong';
-        const baseDb = global.currentDb.useDb(CONFIG.BASE_DB_NAME);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
         const TenantModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.TENANT);
         const tenant = await TenantModel.findById(tenantId);
         if (!tenant) throw 'Tenant Not Found';
@@ -60,7 +59,7 @@ export const deleteTenant = async ({ tenantId }: { tenantId: string }): Promise<
         try {
             await deleteSubDomain({ tenantId });
         } catch (error) {
-            logger('common', `Tenant ${tenantId} has no subdomain - ${error}`);
+            logger.common(`Tenant ${tenantId} has no subdomain - ${error}`);
         }
 
         // deletes tenant
