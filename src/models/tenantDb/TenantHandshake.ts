@@ -6,7 +6,9 @@ import { baseDbModels } from '..';
 
 const TenantHandshake = new Schema(
     {
-        app: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.APP },
+        email: String,
+        name: String,
+        tenant: { type: Schema.Types.ObjectId, ref: MONGOOSE_MODELS.BASE_DB.TENANT },
     },
     {
         timestamps: true,
@@ -14,7 +16,9 @@ const TenantHandshake = new Schema(
 );
 
 export interface ITenantHandshake {
-    app: string | baseDbModels.AppModel.IApp;
+    email: string;
+    name: string;
+    tenant: string | baseDbModels.TenantModel.ITenant;
     _id?: string;
     createdAt?: string;
     updatedAt?: string;

@@ -17,8 +17,8 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
     try {
         const { email, name, password } = data;
         if (!(email && name && password)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
-        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );
         if (!(await TenantModel.findOne({ email }))) {
@@ -34,7 +34,7 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
                 name: tenant.name,
                 email: tenant.email,
             };
-            // setting up tenant db for data isolation for the apps per tenant
+            // setting up tenant baseDb for data isolation for the apps per tenant
             setTimeout(() => {
                 // running asynchrously - if control over configuration is needed -  tenantController.setupTenant return a promise await and listen for response, response will be the type of IResponse
                 tenantController.setupTenant(payload);
@@ -83,8 +83,8 @@ export const SignInTenant = async (
     };
     try {
         const { email, password } = data;
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
-        const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );
         const tenant = await TenantModel.findOne({ email })

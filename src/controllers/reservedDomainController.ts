@@ -8,9 +8,9 @@ export const adminAddNewReservedDomain = async (
 ): Promise<IResponse> => {
     try {
         if (!(data.name && data.name)) throw 'Invalid Data';
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
 
@@ -44,9 +44,9 @@ export const adminAddNewReservedDomain = async (
 export const deleteReservedDomain = async (domainId: string): Promise<IResponse> => {
     try {
         if (!domainId) throw 'Invalid Data';
-        const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
 
-        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = db.model(
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
 

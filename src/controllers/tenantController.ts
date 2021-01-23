@@ -19,7 +19,7 @@ export const setupTenant = async (
             const tenantHandshake = await TentatHandshakeModel.create({
                 email: tenantData.email,
                 name: tenantData.name,
-                tenantId: tenantData.id,
+                tenant: tenantData.id,
             });
             return Promise.resolve({
                 status: true,
