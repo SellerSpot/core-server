@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
 import { tenantController } from 'controllers';
+import { TAuthResponse } from 'typings/response.types';
 
 export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Promise<IResponse> => {
     const response: IResponse = {
@@ -15,6 +16,7 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
     };
     try {
         const { email, name, password } = data;
+        if (!(email && name && password)) throw 'Invalid Data';
         const db = global.currentDb.useDb(DB_NAMES.BASE_DB);
         const TenantModel: baseDbModels.TenantModel.ITenantModel = db.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
@@ -38,7 +40,7 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
                 tenantController.setupTenant(payload);
             });
 
-            response.data = {
+            response.data = <TAuthResponse>{
                 ...payload,
                 subDomain: {
                     _id: '',
@@ -47,7 +49,8 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
                     domainName: '',
                     tenantId: tenant._id,
                     updatedAt: '',
-                } as ISubDomainResponse,
+                },
+                apps: [], // there won't be no apps installed on signUp
                 token: jwt.sign(payload, CONFIG.APP_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
                 }),
@@ -103,7 +106,7 @@ export const SignInTenant = async (
                 createdAt: '',
                 updatedAt: '',
             };
-            response.data = {
+            response.data = <TAuthResponse>{
                 ...payload,
                 subDomain: {
                     ...(<baseDbModels.SubDomainModel.ISubDomain>{
@@ -114,7 +117,7 @@ export const SignInTenant = async (
                         updatedAt: subDomainDetails.updatedAt,
                     }),
                     baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
-                } as ISubDomainResponse,
+                },
                 apps: tenant.apps,
                 token: jwt.sign(payload, CONFIG.APP_SECRET, {
                     expiresIn: '2 days', // check zeit/ms
