@@ -1,8 +1,8 @@
-import { IApp } from 'models/baseDb/App';
+import { baseDbModels } from '@sellerspot/database-models';
 import { ISubDomainResponse, ITokenPayload } from './request.types';
 
 export type TAuthResponse = ITokenPayload & {
     subDomain: ISubDomainResponse;
-    apps: IApp[];
+    apps: baseDbModels.AppModel.IApp[];
     token: string;
 };

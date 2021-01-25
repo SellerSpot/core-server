@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import { logger } from 'utilities/logger';
 import { CONFIG } from './config';
-import * as models from 'models';
+import * as models from '@sellerspot/database-models';
 import { seedAppCollection, seedReservedDomainCollection } from './seedDb';
-import { DB_NAMES } from 'models';
+import { DB_NAMES } from '@sellerspot/database-models';
 
 export const configureDB = (): void => {
     global.dbConnection = mongoose.createConnection(CONFIG.GET_DATABASE_CONNECTION_URL(), {

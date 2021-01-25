@@ -1,4 +1,4 @@
-import { DB_NAMES } from 'models/dbNames';
+import { DB_NAMES } from '@sellerspot/database-models';
 
 export const CONFIG = {
     ENV: process.env.ENV,

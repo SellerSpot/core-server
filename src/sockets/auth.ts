@@ -1,5 +1,5 @@
 import { SOCKET_EVENTS } from 'config/socketEvents';
-import { authController, tenantController } from 'controllers';
+import { authController, tenantController } from 'controllers/controllers';
 import { Socket, Server } from 'socket.io';
 import { IResponse, ITokenPayload } from 'typings/request.types';
 import { logger } from 'utilities/logger';

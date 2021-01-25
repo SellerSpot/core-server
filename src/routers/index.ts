@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import baseRouter from './baseRouter';
+import baseRouter from './base';
 
 const rootRouter: Router = Router();
 

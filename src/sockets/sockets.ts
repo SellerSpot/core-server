@@ -1,12 +1,12 @@
 import { Socket } from 'socket.io';
 import { Server } from 'socket.io';
-import nativeEvents from './nativeEvents';
-import baseEvents from './baseEvents';
+import nativeEvents from './native';
+import baseEvents from './base';
 import { SOCKET_EVENTS } from 'config/socketEvents';
 import { logger } from 'utilities/logger';
-import authEvents from './authEvents';
-import subDomainEvents from './subDomainEvents';
-import appEvents from './appEvents';
+import authEvents from './auth';
+import subDomainEvents from './subDomain';
+import appEvents from './app';
 
 export const setSocketEventHandlers = (io: Server): void => {
     io.on(SOCKET_EVENTS.NATIVE.CONNECTION, (socket: Socket) => {

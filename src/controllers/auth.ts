@@ -1,11 +1,10 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels, DB_NAMES } from 'models';
-import { IResponse, ISubDomainResponse, ITokenPayload } from 'typings/request.types';
+import { MONGOOSE_MODELS, baseDbModels, DB_NAMES } from '@sellerspot/database-models';
+import { IResponse, ITokenPayload } from 'typings/request.types';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Socket } from 'socket.io';
-import { tenantController } from 'controllers';
+import { tenantController } from 'controllers/controllers';
 import { TAuthResponse } from 'typings/response.types';
 
 export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Promise<IResponse> => {

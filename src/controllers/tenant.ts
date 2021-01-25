@@ -1,8 +1,12 @@
-import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels, DB_NAMES, tenantDbModels } from 'models';
+import {
+    MONGOOSE_MODELS,
+    baseDbModels,
+    DB_NAMES,
+    tenantDbModels,
+} from '@sellerspot/database-models';
 import { IResponse } from 'typings/request.types';
 import { logger } from 'utilities/logger';
-import { deleteSubDomain } from './subDomainController';
+import { deleteSubDomain } from './subDomain';
 
 /**
  * onboards a tenant with name and email

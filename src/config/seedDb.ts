@@ -1,12 +1,11 @@
-import { appController, reservedDomainController } from 'controllers';
-import { IApp } from 'models/baseDb/App';
-import { IReservedDomain } from 'models/baseDb/ReservedDomain';
+import { appController, reservedDomainController } from 'controllers/controllers';
+import { baseDbModels } from '@sellerspot/database-models';
 import { logger } from 'utilities/logger';
 
 export const seedAppCollection = async (): Promise<void> => {
     try {
         logger.mongoose('Seeding App collection with default apps.');
-        const apps: IApp[] = [
+        const apps: baseDbModels.AppModel.IApp[] = [
             {
                 name: 'Point of Sale',
                 iconUrl: 'CASH_REGISTER', // need to use s3 bucket to store images and urls should be shared here
@@ -35,7 +34,7 @@ export const seedAppCollection = async (): Promise<void> => {
 export const seedReservedDomainCollection = async (): Promise<void> => {
     try {
         logger.mongoose('Seeding Reserved domain collection.');
-        const reservedDomains: IReservedDomain[] = [
+        const reservedDomains: baseDbModels.ReservedDomainModel.IReservedDomain[] = [
             {
                 name: 'www',
             },

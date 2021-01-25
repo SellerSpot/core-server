@@ -54,6 +54,7 @@
     "webpack-shell-plugin-next": "^2.0.8"
   },
   "dependencies": {
+    "@sellerspot/database-models": "^1.3.0",
     "bcryptjs": "^2.4.3",
     "chalk": "^4.1.0",
     "cors": "^2.8.5",

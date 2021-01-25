@@ -1,6 +1,6 @@
 import { SOCKET_EVENTS } from 'config/socketEvents';
-import { appController, authController } from 'controllers';
-import { baseDbModels } from 'models';
+import { appController, authController } from 'controllers/controllers';
+import { baseDbModels } from '@sellerspot/database-models';
 import { Socket, Server } from 'socket.io';
 import { IResponse, ITokenPayload } from 'typings/request.types';
 import { logger } from 'utilities/logger';

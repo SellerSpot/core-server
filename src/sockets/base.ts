@@ -1,5 +1,5 @@
 import { SOCKET_EVENTS } from 'config/socketEvents';
-import { baseController } from 'controllers';
+import { baseController } from 'controllers/controllers';
 import { Socket, Server } from 'socket.io';
 import { IResponse } from 'typings/request.types';
 import { logger } from 'utilities/logger';

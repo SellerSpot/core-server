@@ -1,13 +1,9 @@
 import { CONFIG } from 'config/config';
-import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { IReservedDomainModel } from 'models/baseDb/ReservedDomain';
-import { ISubDomain, ISubDomainModel } from 'models/baseDb/SubDomain';
-import { ITenantModel } from 'models/baseDb/Tenant';
 import { IResponse, ISubDomainResponse } from 'typings/request.types';
-import { DB_NAMES } from 'models';
+import { DB_NAMES, MONGOOSE_MODELS, baseDbModels } from '@sellerspot/database-models';
 
 export const createSubDomain = async (
-    data: Pick<ISubDomain, 'domainName' | 'tenantId'>,
+    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'domainName' | 'tenantId'>,
 ): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
@@ -15,15 +11,19 @@ export const createSubDomain = async (
             throw 'domain name length exceeded, domain name should be minimum of 3 and maximum of 10 characters';
 
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB); // id comes and mongoose id to converted to  string
-        const TenantModel: ITenantModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(data.tenantId);
         if (!tenant) throw 'Invalid Tenant';
 
-        const SubDomainModel: ISubDomainModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN);
+        const SubDomainModel: baseDbModels.SubDomainModel.ISubDomainModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN,
+        );
         if ((await SubDomainModel.find({ domainName: data.domainName })).length)
             throw 'Domain Not Available! Try alternate domain!';
 
-        const ReservedDomainModel: IReservedDomainModel = baseDb.model(
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
         if ((await ReservedDomainModel.find({ name: data.domainName })).length)
@@ -68,7 +68,7 @@ export const createSubDomain = async (
 };
 
 export const updateSubDomain = async (
-    data: Pick<ISubDomain, 'domainName' | 'tenantId'>,
+    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'domainName' | 'tenantId'>,
 ): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
@@ -76,18 +76,22 @@ export const updateSubDomain = async (
             throw 'domain name length exceeded, domain name should be minimum of 3 and maximum of 10 characters';
 
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB); // id comes and mongoose id to converted to  string
-        const TenantModel: ITenantModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(data.tenantId);
         if (!tenant) throw 'Invalid Tenant';
 
-        const SubDomainModel: ISubDomainModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN);
+        const SubDomainModel: baseDbModels.SubDomainModel.ISubDomainModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN,
+        );
         const subDomain = await SubDomainModel.findById(tenant.subDomain);
         if (!subDomain) throw 'Invalid domain';
 
         if ((await SubDomainModel.find({ domainName: data.domainName })).length)
             throw 'Domain Not Available! Try alternate domain!';
 
-        const ReservedDomainModel: IReservedDomainModel = baseDb.model(
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
         if ((await ReservedDomainModel.find({ name: data.domainName })).length)
@@ -119,16 +123,22 @@ export const updateSubDomain = async (
     }
 };
 
-export const deleteSubDomain = async (data: Pick<ISubDomain, 'tenantId'>): Promise<IResponse> => {
+export const deleteSubDomain = async (
+    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'tenantId'>,
+): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB); // id comes and mongoose id to converted to  string
-        const TenantModel: ITenantModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.TENANT);
+        const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.TENANT,
+        );
         const tenant = await TenantModel.findById(data.tenantId);
         if (!tenant) throw 'Invalid Tenant';
         if (!tenant.subDomain) throw 'Tenant has no subdomain yet';
 
-        const SubDomainModel: ISubDomainModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN);
+        const SubDomainModel: baseDbModels.SubDomainModel.ISubDomainModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN,
+        );
         const subDomain = await SubDomainModel.findById(tenant.subDomain);
         if (!subDomain) throw 'Invalid domain';
         await subDomain.delete();
@@ -156,8 +166,10 @@ export const deleteSubDomain = async (data: Pick<ISubDomain, 'tenantId'>): Promi
 export const checkSubDomainAvailability = async (domainName: string): Promise<IResponse> => {
     try {
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB); // id comes and mongoose id to converted to  string
-        const SubDomainModel: ISubDomainModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN);
-        const ReservedDomainModel: IReservedDomainModel = baseDb.model(
+        const SubDomainModel: baseDbModels.SubDomainModel.ISubDomainModel = baseDb.model(
+            MONGOOSE_MODELS.BASE_DB.SUB_DOMAIN,
+        );
+        const ReservedDomainModel: baseDbModels.ReservedDomainModel.IReservedDomainModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.RESERVED_DOMAIN,
         );
         const isAvailable =

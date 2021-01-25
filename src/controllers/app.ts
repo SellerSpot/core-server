@@ -1,5 +1,10 @@
-import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { appDbModels, baseDbModels, DB_NAMES, tenantDbModels } from 'models';
+import {
+    MONGOOSE_MODELS,
+    appDbModels,
+    baseDbModels,
+    DB_NAMES,
+    tenantDbModels,
+} from '@sellerspot/database-models';
 import { IResponse } from 'typings/request.types';
 import lodash from 'lodash';
 import mongoose, { Document } from 'mongoose';
@@ -74,13 +79,12 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
         const { appId, tenantId } = data;
         if (!(appId && tenantId)) throw 'Invalid Data';
 
+        // make an entry on base db
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
-
         const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
         const app = await AppModel.findById(appId);
         if (!app)
             throw 'App you are looking for is currently not available, contact support for more details';
-
         // create on base db tenant model
         const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
@@ -92,12 +96,21 @@ export const installApp = async (data: { appId: string; tenantId: string }): Pro
         (<string[]>tenant.apps).push(app.id); // installing app
         await tenant.save();
 
-        // create on tenant db installed app model
+        // make an entry on app db tenant model
+        const appDb = global.currentDb.useDb(app.dbName);
+        const InstalledTenantModel: appDbModels.InstalledTenantModel.IInstalledTenantModel = appDb.model(
+            MONGOOSE_MODELS.APP_DB.INSTALLED_TENANT,
+        );
+        await InstalledTenantModel.create({
+            tenant: tenant.id,
+        });
+
+        // make an entry on tenant db installed app model
         const tenantDb = global.currentDb.useDb(tenantId);
         const InstalledAppsModel: tenantDbModels.InstalledAppModel.IInstalledAppModel = tenantDb.model(
             MONGOOSE_MODELS.TENANT_DB.INSTAllED_APP,
         );
-        // no need to check before create here , hence check in basedb tenantModel, earlier, if needed we'll do validation here later.
+        // no need to check before creating here , hence check in basedb tenantModel, earlier, if needed we'll do validation here later.
         await InstalledAppsModel.create({
             app: app.id,
         });
@@ -218,13 +231,13 @@ export const getTenantInstalledAppByIdOrSlug = async (
         );
         const installedApp = await InstalledAppModel.findOne({
             app: requestedApp._id.toString(),
-        }).populate('app', 'app', AppModel); // sending only app property from installedApp model for now, will pivot it later based on requirement
+        }).populate('app', null, AppModel);
         if (!installedApp) throw 'Requested App not installed!';
 
         return Promise.resolve({
             status: true,
             statusCode: 200,
-            data: installedApp,
+            data: installedApp.app, // sending only app property from installedApp model for now, will pivot it later based on requirement
         });
     } catch (error) {
         return Promise.reject({

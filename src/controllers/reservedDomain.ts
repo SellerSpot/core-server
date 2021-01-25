@@ -1,5 +1,4 @@
-import { MONGOOSE_MODELS } from 'models/mongooseModels';
-import { baseDbModels, DB_NAMES } from 'models';
+import { MONGOOSE_MODELS, baseDbModels, DB_NAMES } from '@sellerspot/database-models';
 import { IResponse } from 'typings/request.types';
 
 /* admin interaction controllers */
