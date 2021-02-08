@@ -46,7 +46,7 @@ export const SignUpTenant = async (data: baseDbModels.TenantModel.ITenant): Prom
                     baseDomain: CONFIG.CLIENT_BASE_DOMAIN_FOR_APPS,
                     createdAt: '',
                     domainName: '',
-                    tenantId: tenant._id,
+                    tenant: tenant._id,
                     updatedAt: '',
                 },
                 apps: [], // there won't be no apps installed on signUp
@@ -98,20 +98,20 @@ export const SignInTenant = async (
                 name: tenant.name,
                 email: tenant.email,
             };
-            const subDomainDetails = <baseDbModels.SubDomainModel.ISubDomain>tenant.subDomain ?? {
+            const subDomainDetails = <baseDbModels.SubDomainModel.ISubDomain>(tenant.subDomain ?? {
                 domainName: '',
-                tenantId: tenant._id,
+                tenant: tenant._id,
                 _id: '',
                 createdAt: '',
                 updatedAt: '',
-            };
+            });
             response.data = <TAuthResponse>{
                 ...payload,
                 subDomain: {
                     ...(<baseDbModels.SubDomainModel.ISubDomain>{
                         _id: subDomainDetails._id,
                         domainName: subDomainDetails.domainName,
-                        tenantId: subDomainDetails.tenantId,
+                        tenant: subDomainDetails.tenant,
                         createdAt: subDomainDetails.createdAt,
                         updatedAt: subDomainDetails.updatedAt,
                     }),

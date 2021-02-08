@@ -141,6 +141,8 @@ export const unInstallApp = async (data: {
 
         // delete on basedb tenant model app array
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB);
+        // declaring it for later use (for population purpose)
+        const AppModel: baseDbModels.AppModel.IAppModel = baseDb.model(MONGOOSE_MODELS.BASE_DB.APP);
         const TenantModel: baseDbModels.TenantModel.ITenantModel = baseDb.model(
             MONGOOSE_MODELS.BASE_DB.TENANT,
         );
@@ -157,7 +159,22 @@ export const unInstallApp = async (data: {
         const InstalledAppsModel: tenantDbModels.InstalledAppModel.IInstalledAppModel = tenantDb.model(
             MONGOOSE_MODELS.TENANT_DB.INSTAllED_APP,
         );
-        await InstalledAppsModel.findOneAndDelete({ app: appId });
+        const app = await InstalledAppsModel.findOne({ app: appId }).populate(
+            'app',
+            null,
+            AppModel,
+        );
+        if (!app) throw 'App not installed!';
+        const appDbName = (<baseDbModels.AppModel.IApp>app?.app)?.dbName;
+        if (!appDbName) throw 'App not installed!';
+        await app.delete(); // no need to block the flow, let it async
+
+        // remove the tenant from correspoinding app database (installedTenants)
+        const appDb = global.currentDb.useDb(appDbName);
+        const InstalledTenantModel: appDbModels.InstalledTenantModel.IInstalledTenantModel = appDb.model(
+            MONGOOSE_MODELS.APP_DB.INSTALLED_TENANT,
+        );
+        await InstalledTenantModel.findOneAndDelete({ tenant: tenantId });
 
         return await getTenantInstalledApps({ tenantId });
     } catch (error) {

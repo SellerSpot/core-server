@@ -1,10 +1,12 @@
 import { CONFIG } from 'config/config';
 import { IResponse, ISubDomainResponse } from 'typings/request.types';
 import { DB_NAMES, MONGOOSE_MODELS, baseDbModels } from '@sellerspot/database-models';
+import { string } from 'joi';
 
-export const createSubDomain = async (
-    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'domainName' | 'tenantId'>,
-): Promise<IResponse> => {
+export const createSubDomain = async (data: {
+    domainName: string;
+    tenantId: string;
+}): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
         if (data.domainName && (data.domainName.length < 3 || data.domainName.length > 15))
@@ -36,7 +38,7 @@ export const createSubDomain = async (
 
         const subDomain = await SubDomainModel.create({
             domainName: sanitizedDomainName,
-            tenantId: data.tenantId,
+            tenant: data.tenantId,
         });
         tenant.subDomain = subDomain.id;
         await tenant.save();
@@ -50,7 +52,7 @@ export const createSubDomain = async (
                 createdAt: subDomain.createdAt,
                 updatedAt: subDomain.updatedAt,
                 domainName: subDomain.domainName,
-                tenantId: subDomain.tenantId,
+                tenant: subDomain.tenant,
             } as ISubDomainResponse,
         });
     } catch (error) {
@@ -67,9 +69,10 @@ export const createSubDomain = async (
     }
 };
 
-export const updateSubDomain = async (
-    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'domainName' | 'tenantId'>,
-): Promise<IResponse> => {
+export const updateSubDomain = async (data: {
+    domainName: string;
+    tenantId: string;
+}): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
         if (data.domainName && (data.domainName.length < 3 || data.domainName.length > 15))
@@ -123,9 +126,7 @@ export const updateSubDomain = async (
     }
 };
 
-export const deleteSubDomain = async (
-    data: Pick<baseDbModels.SubDomainModel.ISubDomain, 'tenantId'>,
-): Promise<IResponse> => {
+export const deleteSubDomain = async (data: { tenantId: string }): Promise<IResponse> => {
     try {
         if (!data.tenantId) throw 'Invalid data';
         const baseDb = global.currentDb.useDb(DB_NAMES.BASE_DB); // id comes and mongoose id to converted to  string
