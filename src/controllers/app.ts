@@ -226,7 +226,7 @@ export const getTenantInstalledAppByIdOrSlug = async (
 
         const findIndexQuery = !isSlug
             ? {
-                  _id: mongoose.Types.ObjectId(appIdOrSlug),
+                  _id: appIdOrSlug,
               }
             : {
                   slug: appIdOrSlug.toString(),
