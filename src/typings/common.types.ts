@@ -1,1 +1,1 @@
-export type TPrimitiveType = string | number;
+// types inside this folder should suffix typex.ts extendsion

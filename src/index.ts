@@ -1,35 +1,17 @@
-import express from 'express';
-import http from 'http';
-import { Server as SocketServer } from 'socket.io';
-import { CONFIG } from 'config/config';
-import { applyExpressMiddlewares } from 'config/expressMiddlewares';
+import expresss from 'express';
 import { logger } from 'utilities/logger';
-import { setSocketEventHandlers } from 'sockets/sockets';
-import rootRouter from './routers';
-import { configureDB } from 'config/databaseConfig';
+import { CONFIG, configureDB, applyExpressMiddlewares } from './config/config';
+import rootRouter from './router';
+// globals
+const app: expresss.Application = expresss();
+const PORT: number = CONFIG.PORT;
 
-// initializers
-const app = express();
-const httpServer = http.createServer(app);
-const io: SocketServer = new SocketServer(httpServer, {
-    cors: {
-        origin: '*',
-    },
-});
-
-// initialize mongoose and load models (different from traditional way - that this structure is optimzed of multi-tenant ecosystem)
+// middlewares and configurations
 configureDB();
-
-// express middleware
 applyExpressMiddlewares(app);
 
-// express router
+// router setup
 app.use('/', rootRouter);
 
-// socket event handler
-setSocketEventHandlers(io);
-
-// http listener
-httpServer.listen(CONFIG.PORT, () => {
-    logger.express(`Server started at the port`, CONFIG.PORT);
-});
+// listeners
+app.listen(PORT, () => logger.express(`SellerSpot Core Server Started at the PORT ${PORT}`));

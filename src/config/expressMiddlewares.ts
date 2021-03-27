@@ -1,11 +1,10 @@
-import express, { Application } from 'express';
+import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import { CONFIG } from './config';
 
-export const applyExpressMiddlewares = (app: Application): void => {
-    const isDevelopment = CONFIG.ENV === 'development';
+export const applyExpressMiddlewares = (app: express.Application): void => {
     app.use(express.json());
-    app.use(morgan(isDevelopment ? 'dev' : 'short'));
     app.use(cors());
+    app.use(morgan(CONFIG.ENV === 'development' ? 'dev' : 'short'));
 };

@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import baseRouter from './base';
+import homeRouter from './home';
 
 const rootRouter: Router = Router();
 
-rootRouter.use('/', baseRouter);
+rootRouter.use(homeRouter);
 
 export default rootRouter;

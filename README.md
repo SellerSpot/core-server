@@ -1,8 +1,7 @@
-# core-server
+# core Server
 
-core server is the heart of the sellerspot eco-system, it will hold perform opearation such as creating and managing tenants,
-hold the billing status of the tenant, install and customize application and more.
+## change log
 
-### Developer Notes
+<!-- upcoming logs goes here -->
 
-1. Don't forget to add .env file with .env.example as example.
+- 27/03/2021 - core server base directory setup

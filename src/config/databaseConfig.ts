@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import { logger } from 'utilities/logger';
 import { CONFIG } from './config';
 import * as models from '@sellerspot/database-models';
-import { seedAppCollection, seedReservedDomainCollection } from './seedDb';
 import { DB_NAMES } from '@sellerspot/database-models';
 
 export const configureDB = (): void => {
@@ -12,15 +11,14 @@ export const configureDB = (): void => {
         useFindAndModify: true,
         useCreateIndex: true,
     });
-    global.dbConnection.on('error', (error) =>
-        logger.mongoose(`Error Connecting to ${DB_NAMES.BASE_DB}, ${error.message}`),
+    global.dbConnection.on(
+        'error',
+        (error) =>
+            logger.mongoose(`Error Connecting to ${DB_NAMES.POINT_OF_SALE_DB}, ${error.message}`), // subject to change (core db)
     );
     global.dbConnection.once('open', () => {
-        logger.mongoose(`database: Connected to ${DB_NAMES.BASE_DB}`);
-        // database seed operations goes here
-        seedAppCollection();
-        seedReservedDomainCollection();
+        logger.mongoose(`Connected to ${DB_NAMES.POINT_OF_SALE_DB}`); // subject to change (core db)
     });
-    global.currentDb = global.dbConnection.useDb(DB_NAMES.BASE_DB);
+    global.currentDb = global.dbConnection.useDb(DB_NAMES.POINT_OF_SALE_DB); // subject to change (core db)
     if (models.handshake === true) logger.mongoose(`Loaded All Monogoose Models`);
 };
