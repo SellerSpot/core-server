@@ -1,5 +1,5 @@
 # ---- Base Node ----
-FROM alpine:3.12.3 AS base
+FROM alpine:3.13.4 AS base
 # set work dir
 WORKDIR /app
 # install node

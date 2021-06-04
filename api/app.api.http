@@ -1,0 +1,6 @@
+@devProxyBaseUrl = https://api.sellerspot.in:4506
+
+###
+// @name info
+GET {{devProxyBaseUrl}}/core/info HTTP/1.1
+###

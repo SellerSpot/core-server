@@ -1,17 +1,38 @@
+import 'typings/';
+import 'express-async-errors';
 import expresss from 'express';
-import { logger } from 'utilities/logger';
-import { CONFIG, configureDB, applyExpressMiddlewares } from './config/config';
-import rootRouter from './router';
-// globals
-const app: expresss.Application = expresss();
-const PORT: number = CONFIG.PORT;
+import {
+    logger,
+    middlewares,
+    applyGracefullShutDownHandler,
+    CLSService,
+} from '@sellerspot/universal-functions';
 
-// middlewares and configurations
+import { configureDB } from 'configs/databaseConfig';
+import { CONFIG } from 'configs/config';
+import { rootRouter } from 'routers/router';
+
+// globals
+const app = expresss();
+
+// db configurations
 configureDB();
-applyExpressMiddlewares(app);
+
+//common middlewares applied
+middlewares.applyCommon(app);
 
 // router setup
 app.use('/', rootRouter);
 
+app.use(CLSService.clearScope);
+
+// error handler
+app.use(middlewares.errorHandler);
+
 // listeners
-app.listen(PORT, () => logger.express(`SellerSpot Core Server Started at the PORT ${PORT}`));
+const server = app.listen(CONFIG.PORT, () =>
+    logger.info(`SellerSpot Core Server started on PORT ${CONFIG.PORT}`),
+);
+
+// helps to gracefully shutdown the server
+applyGracefullShutDownHandler(server);

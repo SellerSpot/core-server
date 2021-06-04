@@ -4,9 +4,7 @@
         "noImplicitAny": true,
         "module": "CommonJS",
         "target": "ES5",
-        "lib": [
-            "ESNext",
-        ],
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
         "removeComments": true,
         "allowSyntheticDefaultImports": true,
         "allowJs": true,
@@ -14,32 +12,18 @@
         "resolveJsonModule": true,
         "moduleResolution": "node",
         "downlevelIteration": true,
+        "declaration": true,
+        "declarationDir": "dist",
+        "declarationMap": true,
         "baseUrl": "src",
         "paths": {
-            "config/*": [
-                "config/*"
-            ],
-            "controller/*": [
-                "controller/*"
-            ],
-            "models/*": [
-                "models/*"
-            ],
-            "routers/*": [
-                "routers/*"
-            ],
-            "sockets/*": [
-                "sockets/*"
-            ],
-            "typings/*": [
-                "typings/*"
-            ],
-            "utilities/*": [
-                "utilities/*"
-            ],
+            "configs/*": ["configs/*"],
+            "controllers/*": ["controllers/*"],
+            "models/*": ["models/*"],
+            "routers/*": ["routers/*"],
+            "typings/*": ["typings/*"],
+            "utilities/*": ["utilities/*"]
         }
     },
-    "include": [
-        "src",
-    ]
+    "include": ["src/**/*"]
 }
