@@ -1,1 +1,1 @@
-export const killme = '';
+export * as tenantController from './tenant';

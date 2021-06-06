@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "auth-server",
+            "name": "core-server",
             "request": "launch",
             "runtimeArgs": ["run-script", "dev"],
             "runtimeExecutable": "npm",
