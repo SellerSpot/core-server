@@ -1,15 +1,12 @@
-import {
-    ICheckDomainAvailablityRequestQuery,
-    TJoiErrorMessages,
-} from '@sellerspot/universal-types';
+import { IDomainUpdateRequest, TJoiErrorMessages } from '@sellerspot/universal-types';
 import joi from 'joi';
 
 export default class DomainSchema {
     private static domainLength = {
-        max: 3,
-        min: 15,
+        min: 3,
+        max: 15,
     };
-    static udpateDomainSchema = joi.object<ICheckDomainAvailablityRequestQuery>({
+    static udpateDomainSchema = joi.object<IDomainUpdateRequest>({
         domain: joi
             .string()
             .min(DomainSchema.domainLength.min)
