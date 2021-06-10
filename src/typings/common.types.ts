@@ -1,1 +1,1 @@
-// types inside this folder should suffix typex.ts extendsion
+// types inside this folder should suffix types.ts extension
