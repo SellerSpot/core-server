@@ -12,7 +12,7 @@ export const configureDB = (): void => {
     const connectionObject = mongoose.createConnection(CONFIG.GET_DATABASE_CONNECTION_URL(), {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useFindAndModify: true,
+        useFindAndModify: false, // check reason here https://mongoosejs.com/docs/deprecations.html#findandmodify
         useCreateIndex: true,
         poolSize: 10, // to have multiple connection in case of bottle neck
     });
