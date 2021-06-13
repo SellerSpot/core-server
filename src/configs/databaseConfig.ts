@@ -2,6 +2,7 @@ import { DbConnectionManager, DB_NAMES } from '@sellerspot/database-models';
 import { DatabaseConnectionError, logger } from '@sellerspot/universal-functions';
 import { CONFIG } from 'configs/config';
 import mongoose from 'mongoose';
+import PluginService from 'services/PluginService';
 
 /**
  * Globals configure db
@@ -27,5 +28,8 @@ export const configureDB = (): void => {
 
         // initialize database-models with connection object
         DbConnectionManager.intialize(connectionObject);
+
+        // seed plugins
+        PluginService.seedPlugins();
     });
 };
