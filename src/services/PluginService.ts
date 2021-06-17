@@ -1,6 +1,7 @@
 import { plugins } from 'configs/plugins';
 import { coreDbServices } from '@sellerspot/database-models';
-import { IPlugin, IInstalledPlugin } from '@sellerspot/universal-types';
+import { IPlugin, IInstalledPlugin, ERROR_CODE } from '@sellerspot/universal-types';
+import { BadRequestError, logger } from '../../.yalc/@sellerspot/universal-functions/dist';
 
 export default class PluginService {
     static seedPlugins = async (): Promise<void> => {
@@ -20,7 +21,7 @@ export default class PluginService {
         tenantId: string,
         pluginId: string,
     ): Promise<IInstalledPlugin[]> => {
-        const installedPlugins = await coreDbServices.tenant.addPlugin(tenantId, pluginId);
+        const installedPlugins = await coreDbServices.tenant.addPlugin(pluginId, tenantId);
         const plugins = installedPlugins.map(
             (installedPlugin) =>
                 <IInstalledPlugin>{
@@ -31,5 +32,40 @@ export default class PluginService {
         );
 
         return plugins;
+    };
+
+    static unInstallPlugin = async (
+        tenantId: string,
+        pluginId: string,
+    ): Promise<IInstalledPlugin[]> => {
+        const installedPlugins = await coreDbServices.tenant.removePlugin(pluginId, tenantId);
+        const plugins = installedPlugins.map(
+            (installedPlugin) =>
+                <IInstalledPlugin>{
+                    plugin: installedPlugin.plugin,
+                    createdAt: installedPlugin.createdAt,
+                    updatedAt: installedPlugin.updatedAt,
+                },
+        );
+
+        return plugins;
+    };
+
+    static getPluginDetailsById = async (pluginId: string): Promise<IPlugin> => {
+        const plugin = await coreDbServices.plugin.getPluginById(pluginId);
+        if (!plugin) {
+            logger.error(`Invalid plugin id requested ${pluginId}`);
+            throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Please provide valid plugin id');
+        }
+        return {
+            id: plugin.id,
+            name: plugin.name,
+            uniqueName: plugin.uniqueName,
+            image: plugin.image,
+            iconName: plugin.iconName,
+            bannerImages: plugin.bannerImages,
+            longDescription: plugin.longDescription,
+            shortDescription: plugin.shortDescription,
+        };
     };
 }
