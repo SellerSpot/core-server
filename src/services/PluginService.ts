@@ -8,7 +8,9 @@ export default class PluginService {
         plugins.map(async (plugin) => {
             try {
                 await coreDbServices.plugin.createPlugin(<IPlugin>plugin);
-            } catch (error) {}
+            } catch (error) {
+                logger.error(error?.message);
+            }
         });
     };
 
@@ -58,14 +60,16 @@ export default class PluginService {
             throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Please provide valid plugin id');
         }
         return {
-            id: plugin.id,
+            pluginId: plugin.pluginId,
             name: plugin.name,
-            uniqueName: plugin.uniqueName,
+            icon: plugin.icon,
+            dependantPlugins: <string[]>plugin.dependantPlugins,
+            isVisibleInPluginMenu: plugin.isVisibleInPluginMenu,
+            isVisibleInPluginStore: plugin.isVisibleInPluginStore,
             image: plugin.image,
-            iconName: plugin.iconName,
             bannerImages: plugin.bannerImages,
-            longDescription: plugin.longDescription,
             shortDescription: plugin.shortDescription,
+            longDescription: plugin.longDescription,
         };
     };
 }
