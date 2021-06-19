@@ -7,7 +7,7 @@ import { DomainSchema } from 'schemas/schemas';
 const router = Router();
 
 router.put(
-    ROUTES.CORE.UPDATE_DOMAIN,
+    ROUTES.CORE.DOMAIN.UPDATE_DOMAIN,
     middlewares.auth,
     middlewares.validateSchema({ bodySchema: DomainSchema.udpateDomainSchema }),
     DomainController.updateDomain,
