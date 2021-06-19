@@ -5,6 +5,6 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.delete(ROUTES.CORE.DELETE_TENANT, middlewares.auth, TenantController.deleteTenant);
+router.delete(ROUTES.CORE.TENANT.DELETE_TENANT, middlewares.auth, TenantController.deleteTenant);
 
 export default router;
