@@ -6,7 +6,7 @@ import { LeanDocument } from 'mongoose';
 
 type IDomain = LeanDocument<coreDbModels.IDomain>;
 
-export default class DomainService {
+export class DomainService {
     static updateDomain = async (newDomain: string): Promise<IDomainDetails> => {
         const tenantId = AuthUtil.getCurrentTenantId();
         const domainDoc: IDomain = await coreDbServices.domain.udpateDomainByTenantId(

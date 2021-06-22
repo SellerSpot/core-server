@@ -1,3 +1,4 @@
-export { default as TenantService } from './TenantService';
-export { default as DomainService } from './DomainService';
-export { default as PluginService } from './PluginService';
+export * from './TenantService';
+export * from './DomainService';
+export * from './PluginService';
+export * from './StoreCurrencyService';

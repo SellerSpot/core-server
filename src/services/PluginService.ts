@@ -3,7 +3,7 @@ import { coreDbServices } from '@sellerspot/database-models';
 import { IPlugin, IInstalledPlugin, ERROR_CODE } from '@sellerspot/universal-types';
 import { BadRequestError, logger } from '../../.yalc/@sellerspot/universal-functions/dist';
 
-export default class PluginService {
+export class PluginService {
     static seedPlugins = async (): Promise<void> => {
         plugins.map(async (plugin) => {
             try {

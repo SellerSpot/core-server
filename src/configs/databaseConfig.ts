@@ -2,7 +2,7 @@ import { DbConnectionManager, DB_NAMES } from '@sellerspot/database-models';
 import { DatabaseConnectionError, logger } from '@sellerspot/universal-functions';
 import { CONFIG } from 'configs/config';
 import mongoose from 'mongoose';
-import PluginService from 'services/PluginService';
+import { StoreCurrencyService, PluginService } from 'services/services';
 
 /**
  * Globals configure db
@@ -31,5 +31,8 @@ export const configureDB = (): void => {
 
         // seed plugins
         PluginService.seedPlugins();
+
+        // seed store currencies
+        StoreCurrencyService.seedStoreCurrencies();
     });
 };
