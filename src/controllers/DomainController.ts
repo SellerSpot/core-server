@@ -10,7 +10,7 @@ import { CONFIG } from 'configs/config';
 import { CookieOptions, Request, RequestHandler, Response } from 'express';
 import { DomainService } from 'services/services';
 
-export default class DomainController {
+export class DomainController {
     static updateDomain: RequestHandler = async (req, res) => {
         const { domain: domainName } = <IDomainUpdateRequest>req.body;
         const domainDetails = await DomainService.updateDomain(domainName);

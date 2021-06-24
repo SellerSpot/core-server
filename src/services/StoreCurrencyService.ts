@@ -1,5 +1,6 @@
-import { coreDbServices } from '../../.yalc/@sellerspot/database-models/dist';
-import { logger } from '../../.yalc/@sellerspot/universal-functions/dist';
+import { coreDbServices } from '@sellerspot/database-models';
+import { logger } from '@sellerspot/universal-functions';
+import { IStoreCurrency } from '@sellerspot/universal-types';
 
 export class StoreCurrencyService {
     static seedStoreCurrencies = async (): Promise<void> => {
@@ -10,5 +11,18 @@ export class StoreCurrencyService {
         } catch (error) {
             logger.error(error?.message);
         }
+    };
+
+    static getAllStoreCurrencies = async (): Promise<IStoreCurrency[]> => {
+        const currencies = await coreDbServices.storeCurrency.getAllStoreCurrencies();
+        return currencies.map(
+            (currency) =>
+                <IStoreCurrency>{
+                    id: currency._id,
+                    code: currency.code,
+                    name: currency.name,
+                    symbol: currency.symbol,
+                },
+        );
     };
 }
