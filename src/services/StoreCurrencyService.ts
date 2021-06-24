@@ -25,4 +25,20 @@ export class StoreCurrencyService {
                 },
         );
     };
+
+    static updateStoreCurrency = async (
+        tenantId: string,
+        currencyId: string,
+    ): Promise<IStoreCurrency> => {
+        const updatedCurrency = await coreDbServices.tenant.updateStoreCurrencyById(
+            tenantId,
+            currencyId,
+        );
+        return <IStoreCurrency>{
+            id: updatedCurrency._id,
+            code: updatedCurrency.code,
+            name: updatedCurrency.name,
+            symbol: updatedCurrency.symbol,
+        };
+    };
 }

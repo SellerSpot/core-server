@@ -1,7 +1,7 @@
 import { ROUTES } from '@sellerspot/universal-types';
 import { PluginController } from 'controllers/controllers';
 import { Router } from 'express';
-import PluginSchema from 'schemas/PluginSchema';
+import { PluginSchema } from 'schemas/schemas';
 import { middlewares } from '../../.yalc/@sellerspot/universal-functions/dist';
 
 const router = Router();

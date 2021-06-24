@@ -5,7 +5,9 @@ import {
 } from '@sellerspot/universal-types';
 import joi from 'joi';
 
-export default class PluginSchema {
+export class PluginSchema {
+    static MONGOOSE_OBJECT_ID_LENGTH = 24;
+
     static installPluginSchema = joi.object<IInstallPluginRequest>({
         id: joi.string().required(),
     });
