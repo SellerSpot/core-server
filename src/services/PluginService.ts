@@ -1,17 +1,16 @@
-import { plugins } from 'configs/plugins';
 import { coreDbServices } from '@sellerspot/database-models';
 import { IPlugin, IInstalledPlugin, ERROR_CODE } from '@sellerspot/universal-types';
-import { BadRequestError, logger } from '../../.yalc/@sellerspot/universal-functions/dist';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
 
 export class PluginService {
     static seedPlugins = async (): Promise<void> => {
-        plugins.map(async (plugin) => {
-            try {
-                await coreDbServices.plugin.createPlugin(<IPlugin>plugin);
-            } catch (error) {
-                logger.error(error?.message);
-            }
-        });
+        const { seedPlugins } = coreDbServices.plugin;
+        try {
+            await seedPlugins();
+            logger.info('Plugins seeded successfully');
+        } catch (error) {
+            logger.error(error?.message);
+        }
     };
 
     static getAllPlugins = async (): Promise<IPlugin[]> => {
@@ -60,7 +59,8 @@ export class PluginService {
             throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Please provide valid plugin id');
         }
         return {
-            pluginId: plugin.pluginId,
+            id: plugin._id,
+            uniqueName: plugin.uniqueName,
             name: plugin.name,
             icon: plugin.icon,
             dependantPlugins: <string[]>plugin.dependantPlugins,
