@@ -1,6 +1,7 @@
-import { coreDbServices } from '@sellerspot/database-models';
+import { coreDbModels, coreDbServices } from '@sellerspot/database-models';
 import { IPlugin, IInstalledPlugin, ERROR_CODE } from '@sellerspot/universal-types';
 import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { LeanDocument } from 'mongoose';
 
 export class PluginService {
     static seedPlugins = async (): Promise<void> => {
@@ -15,7 +16,7 @@ export class PluginService {
 
     static getAllPlugins = async (): Promise<IPlugin[]> => {
         const plugins = await coreDbServices.plugin.getAllPlugins();
-        return plugins as IPlugin[];
+        return plugins.map((plugin) => PluginService.getStructuredPlugin(plugin)) as IPlugin[];
     };
 
     static installPlugin = async (
@@ -26,7 +27,9 @@ export class PluginService {
         const plugins = installedPlugins.map(
             (installedPlugin) =>
                 <IInstalledPlugin>{
-                    plugin: installedPlugin.plugin,
+                    plugin: PluginService.getStructuredPlugin(
+                        installedPlugin.plugin as coreDbModels.IPlugin,
+                    ),
                     createdAt: installedPlugin.createdAt,
                     updatedAt: installedPlugin.updatedAt,
                 },
@@ -43,7 +46,9 @@ export class PluginService {
         const plugins = installedPlugins.map(
             (installedPlugin) =>
                 <IInstalledPlugin>{
-                    plugin: installedPlugin.plugin,
+                    plugin: PluginService.getStructuredPlugin(
+                        installedPlugin.plugin as coreDbModels.IPlugin,
+                    ),
                     createdAt: installedPlugin.createdAt,
                     updatedAt: installedPlugin.updatedAt,
                 },
@@ -58,18 +63,20 @@ export class PluginService {
             logger.error(`Invalid plugin id requested ${pluginId}`);
             throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Please provide valid plugin id');
         }
-        return {
-            id: plugin._id,
-            uniqueName: plugin.uniqueName,
-            name: plugin.name,
-            icon: plugin.icon,
-            dependantPlugins: <string[]>plugin.dependantPlugins,
-            isVisibleInPluginMenu: plugin.isVisibleInPluginMenu,
-            isVisibleInPluginStore: plugin.isVisibleInPluginStore,
-            image: plugin.image,
-            bannerImages: plugin.bannerImages,
-            shortDescription: plugin.shortDescription,
-            longDescription: plugin.longDescription,
-        };
+        return PluginService.getStructuredPlugin(plugin);
     };
+
+    static getStructuredPlugin = (plugin: LeanDocument<coreDbModels.IPluginDoc>): IPlugin => ({
+        id: plugin._id,
+        uniqueName: plugin.uniqueName,
+        name: plugin.name,
+        icon: plugin.icon,
+        dependantPlugins: <string[]>plugin.dependantPlugins,
+        isVisibleInPluginMenu: plugin.isVisibleInPluginMenu,
+        isVisibleInPluginStore: plugin.isVisibleInPluginStore,
+        image: plugin.image,
+        bannerImages: plugin.bannerImages,
+        shortDescription: plugin.shortDescription,
+        longDescription: plugin.longDescription,
+    });
 }
