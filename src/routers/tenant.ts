@@ -1,7 +1,8 @@
+import { Router } from 'express';
 import { middlewares } from '@sellerspot/universal-functions';
 import { ROUTES } from '@sellerspot/universal-types';
+
 import { TenantController } from 'controllers/controllers';
-import { Router } from 'express';
 
 const router = Router();
 

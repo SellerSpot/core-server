@@ -2,7 +2,7 @@ import { STATUS_CODE } from '@sellerspot/universal-types';
 import { RequestHandler } from 'express';
 import { TenantService } from 'services/services';
 
-export default class TenantController {
+export class TenantController {
     static deleteTenant: RequestHandler = async (_, res) => {
         const deleteAccountStatus = await TenantService.deleteTenant();
         if (deleteAccountStatus) {

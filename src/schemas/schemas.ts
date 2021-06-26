@@ -1,1 +1,3 @@
-export { default as DomainSchema } from './DomainSchema';
+export * from './DomainSchema';
+export * from './PluginSchema';
+export * from './StoreCurrencySchema';

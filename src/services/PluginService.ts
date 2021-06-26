@@ -1,22 +1,22 @@
-import { plugins } from 'configs/plugins';
-import { coreDbServices } from '@sellerspot/database-models';
+import { coreDbModels, coreDbServices } from '@sellerspot/database-models';
 import { IPlugin, IInstalledPlugin, ERROR_CODE } from '@sellerspot/universal-types';
-import { BadRequestError, logger } from '../../.yalc/@sellerspot/universal-functions/dist';
+import { BadRequestError, logger } from '@sellerspot/universal-functions';
+import { LeanDocument } from 'mongoose';
 
-export default class PluginService {
+export class PluginService {
     static seedPlugins = async (): Promise<void> => {
-        plugins.map(async (plugin) => {
-            try {
-                await coreDbServices.plugin.createPlugin(<IPlugin>plugin);
-            } catch (error) {
-                logger.error(error?.message);
-            }
-        });
+        const { seedPlugins } = coreDbServices.plugin;
+        try {
+            await seedPlugins();
+            logger.info('Plugins seeded successfully');
+        } catch (error) {
+            logger.error(error?.message);
+        }
     };
 
     static getAllPlugins = async (): Promise<IPlugin[]> => {
         const plugins = await coreDbServices.plugin.getAllPlugins();
-        return plugins as IPlugin[];
+        return plugins.map((plugin) => PluginService.getStructuredPlugin(plugin)) as IPlugin[];
     };
 
     static installPlugin = async (
@@ -27,7 +27,9 @@ export default class PluginService {
         const plugins = installedPlugins.map(
             (installedPlugin) =>
                 <IInstalledPlugin>{
-                    plugin: installedPlugin.plugin,
+                    plugin: PluginService.getStructuredPlugin(
+                        installedPlugin.plugin as coreDbModels.IPlugin,
+                    ),
                     createdAt: installedPlugin.createdAt,
                     updatedAt: installedPlugin.updatedAt,
                 },
@@ -44,7 +46,9 @@ export default class PluginService {
         const plugins = installedPlugins.map(
             (installedPlugin) =>
                 <IInstalledPlugin>{
-                    plugin: installedPlugin.plugin,
+                    plugin: PluginService.getStructuredPlugin(
+                        installedPlugin.plugin as coreDbModels.IPlugin,
+                    ),
                     createdAt: installedPlugin.createdAt,
                     updatedAt: installedPlugin.updatedAt,
                 },
@@ -59,17 +63,20 @@ export default class PluginService {
             logger.error(`Invalid plugin id requested ${pluginId}`);
             throw new BadRequestError(ERROR_CODE.PLUGIN_INVALID, 'Please provide valid plugin id');
         }
-        return {
-            pluginId: plugin.pluginId,
-            name: plugin.name,
-            icon: plugin.icon,
-            dependantPlugins: <string[]>plugin.dependantPlugins,
-            isVisibleInPluginMenu: plugin.isVisibleInPluginMenu,
-            isVisibleInPluginStore: plugin.isVisibleInPluginStore,
-            image: plugin.image,
-            bannerImages: plugin.bannerImages,
-            shortDescription: plugin.shortDescription,
-            longDescription: plugin.longDescription,
-        };
+        return PluginService.getStructuredPlugin(plugin);
     };
+
+    static getStructuredPlugin = (plugin: LeanDocument<coreDbModels.IPluginDoc>): IPlugin => ({
+        id: plugin._id,
+        uniqueName: plugin.uniqueName,
+        name: plugin.name,
+        icon: plugin.icon,
+        dependantPlugins: <string[]>plugin.dependantPlugins,
+        isVisibleInPluginMenu: plugin.isVisibleInPluginMenu,
+        isVisibleInPluginStore: plugin.isVisibleInPluginStore,
+        image: plugin.image,
+        bannerImages: plugin.bannerImages,
+        shortDescription: plugin.shortDescription,
+        longDescription: plugin.longDescription,
+    });
 }

@@ -11,7 +11,7 @@ import {
     STATUS_CODE,
 } from '@sellerspot/universal-types';
 
-export default class PluginController {
+export class PluginController {
     static getAllPlugins: RequestHandler = async (_, res) => {
         const plugins = await PluginService.getAllPlugins();
         const response: IGetAllPluginsResponse = {
