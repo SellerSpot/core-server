@@ -1,7 +1,7 @@
 import { IDomainUpdateRequest, TJoiErrorMessages } from '@sellerspot/universal-types';
 import joi from 'joi';
 
-export default class DomainSchema {
+export class DomainSchema {
     private static domainLength = {
         min: 3,
         max: 15,
