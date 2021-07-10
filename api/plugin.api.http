@@ -1,6 +1,18 @@
 @devProxyBaseUrl = https://api.sellerspot.in:4506
 
 ###
-// @name allplugins
-GET {{devProxyBaseUrl}}/core/allplugins HTTP/1.1
+// @name get_plugins
+GET {{devProxyBaseUrl}}/core/plugins HTTP/1.1
+###
+
+###
+// @name add_plugin
+POST {{devProxyBaseUrl}}/core/plugins/POINT_OF_SALE/install HTTP/1.1
+Authorization: Bearer {{token}}
+###
+
+###
+// @name remove_plugin
+DELETE  {{devProxyBaseUrl}}/core/plugins/POINT_OF_SALE/uninstall HTTP/1.1
+Authorization: Bearer {{token}}
 ###
